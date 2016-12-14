@@ -79,7 +79,7 @@
           console.log(authResult);
           $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList?access_token="+authResult.access_token, function( data ) {
              data.items.forEach(function(calendar){
-               if(calendar.accessRole=="owner"){
+               if(calendar.accessRole=="owner" && calendar.selected){
                  tag = calendar.id.substring(0,8);
                  var template = `
                  <section class="page-header" style="background:${calendar.backgroundColor};">
