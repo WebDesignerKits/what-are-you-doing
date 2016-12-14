@@ -73,7 +73,10 @@
         if (authResult && !authResult.error) {
           // Hide auth UI, then load client library.
           authorizeDiv.style.display = 'none';
-          
+          console.log(authResult);
+          $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList?access_token="+authResult, function( data ) {
+             appendPre(data);
+          });
           loadCalendarApi();
         } else {
           // Show auth UI, allowing the user to initiate authorization by
@@ -100,9 +103,6 @@
        */
       function loadCalendarApi() {
         SYNCED_WITH_GOOGLE = true;
-        $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList", function( data ) {
-             appendPre(data);
-        });
         gapi.client.load('calendar', 'v3', listUpcomingEvents);
       }
 
