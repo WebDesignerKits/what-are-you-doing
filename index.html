@@ -75,7 +75,7 @@
           authorizeDiv.style.display = 'none';
           console.log(authResult);
           $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList?access_token="+authResult.access_token, function( data ) {
-             appendPre(data);
+             console.log(data)
           });
           loadCalendarApi();
         } else {
