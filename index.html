@@ -80,11 +80,12 @@
           $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList?access_token="+authResult.access_token, function( data ) {
              data.items.forEach(function(calendar){
                if(calendar.accessRole=="owner"){
+                 tag = calendar.id.substring(0,8);
                  var template = `
                  <section class="page-header" style="background:${calendar.backgroundColor};">
                   <h1 class="project-name">${calendar.summary}</h1>
                   <h2 class="project-tagline"></h2>
-                  <input placeholder="What are you doing?" id="description" name="doing" style="border-radius:30px; padding:20px; border:none; text-align:center; width:100%; max-width:400px; color:black; margin-bottom:20px;" type="text" />
+                  <input placeholder="What are you doing?" id="description${tag}" name="doing" style="border-radius:30px; padding:20px; border:none; text-align:center; width:100%; max-width:400px; color:black; margin-bottom:20px;" type="text" />
                   <span class="btn" onclick="startButton(this,'${calendar.id}')" style="width:160px; cursor:pointer;">Start</span>
                 </section>
                  `;
@@ -188,13 +189,12 @@ var CALENDAR_EVENT = {
 
       function startButton(obj,id){
         var id = id || 'primary';
+        tag = id.substring(0,8);
         if(SYNCED_WITH_GOOGLE){
           // get the time stamp
           // get the description
-          localStorage.setItem("summary", $('#description').val());
-          localStorage.setItem("start", moment().format());
-          
-          console.log(CALENDAR_EVENT);
+          localStorage.setItem("summary"+tag, $('#description'+tag).val());
+          localStorage.setItem("start"+tag, moment().format());
           $(obj).html('Finish');
           that = obj;
           obj.onclick = function(){ finishButton(that); }
@@ -205,10 +205,12 @@ var CALENDAR_EVENT = {
       
       function finishButton(obj,id){
          var id = id || 'primary';
-         CALENDAR_EVENT['summary'] = localStorage.getItem("summary");
-         CALENDAR_EVENT['start']['dateTime'] = localStorage.getItem("start");
+         tag = id.substring(0,8);
+         CALENDAR_EVENT['summary'] = localStorage.getItem("summary"+tag);
+         CALENDAR_EVENT['start']['dateTime'] = localStorage.getItem("start"+tag);
          CALENDAR_EVENT['end']['dateTime'] = moment().format();
           console.log(CALENDAR_EVENT);
+          console.log(id);
           var request = gapi.client.calendar.events.insert({
             'calendarId': id,
             'resource': CALENDAR_EVENT
@@ -217,7 +219,7 @@ var CALENDAR_EVENT = {
           request.execute(function(event) {
             appendPre('Event created: ' + event.htmlLink);
           });
-        $('#description').val("");
+        $('#description'+tag).val("");
         $(obj).html('Start');
         that = obj;
         obj.onclick = function(){ startButton(that); }
