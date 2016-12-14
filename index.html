@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
+
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>What-are-you-doing by WebDesignerKits</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/github-light.css" media="screen">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script data-require="jquery@*" data-semver="3.0.0" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.js"></script>
+    <script data-require="moment.js@*" data-semver="2.14.1" src="https://npmcdn.com/moment@2.14.1"></script>
+    <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/normalize.css" media="screen" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/github-light.css" media="screen" />
     <style>
       .btn {
         background: #e0e0e0;
@@ -41,7 +44,7 @@
       // Your Client ID can be retrieved from your project in the Google
       // Developer Console, https://console.developers.google.com
       var CLIENT_ID = '383204850743-8p1cu9u4g25cp82dhgqtce2qttj29976.apps.googleusercontent.com';
-
+      var SYNCED_WITH_GOOGLE = false;
       var SCOPES = ["https://www.googleapis.com/auth/calendar"];
 
       /**
@@ -66,6 +69,7 @@
         if (authResult && !authResult.error) {
           // Hide auth UI, then load client library.
           authorizeDiv.style.display = 'none';
+          
           loadCalendarApi();
         } else {
           // Show auth UI, allowing the user to initiate authorization by
@@ -91,6 +95,7 @@
        * once client library is loaded.
        */
       function loadCalendarApi() {
+        SYNCED_WITH_GOOGLE = true;
         gapi.client.load('calendar', 'v3', listUpcomingEvents);
       }
 
@@ -141,43 +146,96 @@
         pre.appendChild(textContent);
       }
 
+var event = {
+  'summary': 'Basic event',
+  'location': '',
+  'description': 'I did this',
+  'start': {
+    'dateTime': '2015-05-28T09:00:00-07:00',
+  },
+  'end': {
+    'dateTime': '2015-05-28T17:00:00-07:00',
+  }
+};
+
+
+
+
+      function startButton(obj){
+        if(SYNCED_WITH_GOOGLE){
+          // get the time stamp
+          // get the description
+          event.summary = $('#description').val();
+          event.start.dateTime = moment().format();
+          $(obj).html('Finish');
+          that = obj;
+          obj.onclick = function(){ finishButton(that); }
+        }else{
+          alert('You need to authorize Google Calendars! Read below for instructions.')
+        }
+      }
+      
+      function finishButton(obj){
+         event.end.dateTime = moment().format();
+          var request = gapi.client.calendar.events.insert({
+            'calendarId': 'primary',
+            'resource': event
+          });
+          
+          request.execute(function(event) {
+            appendPre('Event created: ' + event.htmlLink);
+          });
+        $('#description').html("");
+        $(obj).html('Start');
+        that = obj;
+        obj.onclick = function(){ startButton(that); }
+      }
+
     </script>
-    <script src="https://apis.google.com/js/client.js?onload=checkAuth">
-    </script>
+    <script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
   </head>
+
   <body>
     <section class="page-header">
       <h1 class="project-name">What are you doing?</h1>
       <h2 class="project-tagline"></h2>
-      <input placeholder="What are you doing?" type="text" name="doing" style='border-radius:30px; padding:20px; border:none; text-align:center; width:400px; color:black'/>
-      <span class="btn" style='width:160px; cursor:pointer;'>Start</span>
+      <input placeholder="What are you doing?" id="description" name="doing" style="border-radius:30px; padding:20px; border:none; text-align:center; width:400px; color:black" type="text" />
+      <span class="btn" style="width:160px; cursor:pointer;">Start</span>
     </section>
-
     <section class="main-content">
-<h3>
-<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Keep track of what you did today.</h3>
+      <h3>
+        <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true">
+          <span aria-hidden="true" class="octicon octicon-link"></span>
+        </a>
 
-<p>
+Keep track of what you did today.</h3>
+      <p>
   This app records the start time and end time of whatever you are doing and submits it as an event to Google Calendar. Allowing you to keep a record of what you did during the day.
   </p>
-  
-  <div id="authorize-div" style="display: none">
-      <span>Authorize access to Google Calendar API</span>
-      <!--Button for the user to click to initiate auth sequence -->
-      <button id="authorize-button" onclick="handleAuthClick(event)">
+      <div id="authorize-div" style="display: none">
+        <span>Authorize access to Google Calendar API</span>
+        <!--Button for the user to click to initiate auth sequence -->
+        <button id="authorize-button" onclick="handleAuthClick(event)">
         Authorize
       </button>
-    </div>
-    <pre id="output"></pre>
-
+      </div>
+      <pre id="output"></pre>
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/WebDesignerKits/what-are-you-doing">What-are-you-doing</a> is maintained by <a href="https://github.com/WebDesignerKits">WebDesignerKits</a>.</span>
+        <span class="site-footer-owner">
+          <a href="https://github.com/WebDesignerKits/what-are-you-doing">What-are-you-doing</a>
 
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+ is maintained by                     <a href="https://github.com/WebDesignerKits">WebDesignerKits</a>
+
+.</span>
+        <span class="site-footer-credits">This page was generated by                     <a href="https://pages.github.com">GitHub Pages</a>
+
+ using the                     <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a>
+
+ by                     <a href="https://twitter.com/jasonlong">Jason Long</a>
+
+.</span>
       </footer>
-
     </section>
-
-  
   </body>
+
 </html>
