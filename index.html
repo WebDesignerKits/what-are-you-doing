@@ -100,7 +100,7 @@
        */
       function loadCalendarApi() {
         SYNCED_WITH_GOOGLE = true;
-        $.get( "ajax/test.html", function( data ) {
+        $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList", function( data ) {
              appendPre(data);
         });
         gapi.client.load('calendar', 'v3', listUpcomingEvents);
@@ -273,4 +273,3 @@ Keep track of what you did today.</h3>
   </body>
 
 </html>
-
