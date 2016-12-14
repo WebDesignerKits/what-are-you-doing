@@ -34,7 +34,7 @@
         margin-bottom:20px;
       }
       
-      .btn:hover {
+      .finish {
         background: #50616b;
         background-image: -webkit-linear-gradient(top, #50616b, #7f909c);
         background-image: -moz-linear-gradient(top, #50616b, #7f909c);
@@ -197,6 +197,7 @@ var CALENDAR_EVENT = {
           localStorage.setItem("start"+tag, moment().format());
           $("#button"+tag).html('Finish');
           that = obj;
+          $("#button"+tag).addClass("finish");
           $("#button"+tag)[0].onclick = function(){ finishButton(that,id); }
         }else{
           alert('You need to authorize Google Calendars! Read below for instructions.')
@@ -222,6 +223,7 @@ var CALENDAR_EVENT = {
         $('#description'+tag).val("");
         $("#button"+tag).html('Start');
         that = obj;
+        $("#button"+tag).removeClass("finish");
         $("#button"+tag)[0].onclick = function(){ startButton(that,id); }
       }
 
