@@ -167,9 +167,9 @@ var CALENDAR_EVENT = {
         if(SYNCED_WITH_GOOGLE){
           // get the time stamp
           // get the description
-          CALENDAR_EVENT.summary = $('#description').val();
-          CALENDAR_EVENT.start.dateTime = moment().format();
-          console.log(CALENDAR_EVENT)
+          CALENDAR_EVENT['summary'] = $('#description').val();
+          CALENDAR_EVENT['start']['dateTime'] = moment().format();
+          console.log(CALENDAR_EVENT);
           $(obj).html('Finish');
           that = obj;
           obj.onclick = function(){ finishButton(that); }
@@ -179,7 +179,7 @@ var CALENDAR_EVENT = {
       }
       
       function finishButton(obj){
-         CALENDAR_EVENT.end.dateTime = moment().format();
+         CALENDAR_EVENT['end']['dateTime'] = moment().format();
           var request = gapi.client.calendar.events.insert({
             'calendarId': 'primary',
             'resource': CALENDAR_EVENT
