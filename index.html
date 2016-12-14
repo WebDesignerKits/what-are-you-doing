@@ -86,7 +86,7 @@
                   <h1 class="project-name">${calendar.summary}</h1>
                   <h2 class="project-tagline"></h2>
                   <input placeholder="What are you doing?" id="description${tag}" name="doing" style="border-radius:30px; padding:20px; border:none; text-align:center; width:100%; max-width:400px; color:black; margin-bottom:20px;" type="text" />
-                  <span class="btn" onclick="startButton(this,'${calendar.id}')" style="width:160px; cursor:pointer;">Start</span>
+                  <span class="btn" id="button${tag}" onclick="startButton(this,'${calendar.id}')" style="width:160px; cursor:pointer;">Start</span>
                 </section>
                  `;
                  $('#theCalendars').append(template);
@@ -195,9 +195,9 @@ var CALENDAR_EVENT = {
           // get the description
           localStorage.setItem("summary"+tag, $('#description'+tag).val());
           localStorage.setItem("start"+tag, moment().format());
-          $(obj).html('Finish');
+          $("#button"+tag).html('Finish');
           that = obj;
-          obj.onclick = function(){ finishButton(that,id); }
+          $("#button"+tag)[0].onclick = function(){ finishButton(that,id); }
         }else{
           alert('You need to authorize Google Calendars! Read below for instructions.')
         }
@@ -220,9 +220,9 @@ var CALENDAR_EVENT = {
             appendPre('Event created: ' + event.htmlLink);
           });
         $('#description'+tag).val("");
-        $(obj).html('Start');
+        $("#button"+tag).html('Start');
         that = obj;
-        obj.onclick = function(){ startButton(that,id); }
+        $("#button"+tag)[0].onclick = function(){ startButton(that,id); }
       }
 
     </script>
