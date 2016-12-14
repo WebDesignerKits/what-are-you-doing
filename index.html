@@ -161,11 +161,14 @@ var event = {
 
 
 
+
+
       function startButton(obj){
         if(SYNCED_WITH_GOOGLE){
           // get the time stamp
           // get the description
           event.summary = $('#description').val();
+          console.log(event)
           event.start.dateTime = moment().format();
           $(obj).html('Finish');
           that = obj;
