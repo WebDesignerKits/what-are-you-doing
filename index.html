@@ -197,7 +197,7 @@ var CALENDAR_EVENT = {
           localStorage.setItem("start"+tag, moment().format());
           $(obj).html('Finish');
           that = obj;
-          obj.onclick = function(){ finishButton(that); }
+          obj.onclick = function(){ finishButton(that,id); }
         }else{
           alert('You need to authorize Google Calendars! Read below for instructions.')
         }
@@ -222,7 +222,7 @@ var CALENDAR_EVENT = {
         $('#description'+tag).val("");
         $(obj).html('Start');
         that = obj;
-        obj.onclick = function(){ startButton(that); }
+        obj.onclick = function(){ startButton(that,id); }
       }
 
     </script>
