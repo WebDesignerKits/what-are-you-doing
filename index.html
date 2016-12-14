@@ -192,7 +192,7 @@ var CALENDAR_EVENT = {
           request.execute(function(event) {
             appendPre('Event created: ' + event.htmlLink);
           });
-        $('#description').html("");
+        $('#description').val("");
         $(obj).html('Start');
         that = obj;
         obj.onclick = function(){ startButton(that); }
@@ -217,7 +217,7 @@ var CALENDAR_EVENT = {
 
 Keep track of what you did today.</h3>
       <p>
-  This app records the start time and end time of whatever you are doing and submits it as an event to Google Calendar. Allowing you to keep a record of what you did during the day.
+  This app records the start time and end time of whatever you are doing and submits it as an event to Google Calendar, allowing you to keep a record of what you did during the day.
   </p>
       <div id="authorize-div" style="display: none">
         <span>Authorize access to Google Calendar API</span>
