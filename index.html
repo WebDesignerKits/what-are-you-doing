@@ -68,6 +68,9 @@
        *
        * @param {Object} authResult Authorization result.
        */
+       
+      
+       
       function handleAuthResult(authResult) {
         var authorizeDiv = document.getElementById('authorize-div');
         if (authResult && !authResult.error) {
@@ -75,6 +78,19 @@
           authorizeDiv.style.display = 'none';
           console.log(authResult);
           $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList?access_token="+authResult.access_token, function( data ) {
+             data.items.forEach(function(calendar){
+               if(calendar.accessRole=="owner"){
+                 var template = `
+                 <section class="page-header" style="background:${calendar.backgroundColor};">
+                  <h1 class="project-name">${calendar.summary}</h1>
+                  <h2 class="project-tagline"></h2>
+                  <input placeholder="What are you doing?" id="description" name="doing" style="border-radius:30px; padding:20px; border:none; text-align:center; width:100%; max-width:400px; color:black; margin-bottom:20px;" type="text" />
+                  <span class="btn" onclick="startButton(this,'${calendar.id}')" style="width:160px; cursor:pointer;">Start</span>
+                </section>
+                 `;
+                 $('#theCalendars').append(template);
+               }
+             }); 
              console.log(data)
           });
           loadCalendarApi();
@@ -257,16 +273,8 @@ Keep track of what you did today.</h3>
 .</span>
       </footer>
     </section>
-      <section class="page-header" style="background:#911536;">
-      <h1 class="project-name">What are you doing?</h1>
-      <h2 class="project-tagline"></h2>
-      <p>Calendar ID</p>
-      <select>
-        <option></option>
-      </select>
-      <br/><br/>
-      <input placeholder="What are you doing?" id="description" name="doing" style="border-radius:30px; padding:20px; border:none; text-align:center; width:100%; max-width:400px; color:black; margin-bottom:20px;" type="text" />
-      <span class="btn" onclick="startButton(this)" style="width:160px; cursor:pointer;">Start</span>
+    <section id="theCalendars">
+      
     </section>
       
       
