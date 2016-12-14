@@ -31,6 +31,7 @@
         padding: 10px 20px 10px 20px;
         border: solid #d7d9db 2px;
         text-decoration: none;
+        margin-bottom:20px;
       }
       
       .btn:hover {
@@ -99,6 +100,10 @@
        */
       function loadCalendarApi() {
         SYNCED_WITH_GOOGLE = true;
+        GET https://www.googleapis.com/calendar/v3/users/me/calendarList
+        $.get( "ajax/test.html", function( data ) {
+             appendPre(data);
+        });
         gapi.client.load('calendar', 'v3', listUpcomingEvents);
       }
 
@@ -232,6 +237,11 @@ Keep track of what you did today.</h3>
       </button>
       </div>
       <pre id="output"></pre>
+      
+      
+      
+    
+      
       <footer class="site-footer">
         <span class="site-footer-owner">
           <a href="https://github.com/WebDesignerKits/what-are-you-doing">What-are-you-doing</a>
@@ -248,6 +258,19 @@ Keep track of what you did today.</h3>
 .</span>
       </footer>
     </section>
+      <section class="page-header" style="background:#911536;">
+      <h1 class="project-name">What are you doing?</h1>
+      <h2 class="project-tagline"></h2>
+      <p>Calendar ID</p>
+      <select>
+        <option></option>
+      </select>
+      <br/><br/>
+      <input placeholder="What are you doing?" id="description" name="doing" style="border-radius:30px; padding:20px; border:none; text-align:center; width:100%; max-width:400px; color:black; margin-bottom:20px;" type="text" />
+      <span class="btn" onclick="startButton(this)" style="width:160px; cursor:pointer;">Start</span>
+    </section>
+      
+      
   </body>
 
 </html>
