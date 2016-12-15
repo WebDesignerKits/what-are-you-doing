@@ -105,6 +105,7 @@
                   <h2 class="project-tagline"></h2>
                   <input placeholder="What are you doing?" id="description${tag}" value="${description}" name="doing" style="border-radius:30px; padding:20px; border:none; text-align:center; width:100%; max-width:400px; color:black; margin-bottom:20px;" type="text" />
                   <span class="btn" id="button${tag}" onclick="startButton(this,'${calendar.id}')" style="width:160px; cursor:pointer;">Start</span>
+                  <h2 id="created${tag}" style="display:none;">Event created!</h2>
                 </section>
                  `;
                  $('#theCalendars').append(template);
@@ -239,6 +240,9 @@ var CALENDAR_EVENTS = {};
         localStorage.setItem("button"+tag,"start");
         
         setButtonStart(obj,id,tag)
+        $("#created"+tag).fadeTo(500,1,function(){
+          $(this).fadeTo(500,0);
+        });
       }
       
       function setButtonFinish(obj,id,tag){
