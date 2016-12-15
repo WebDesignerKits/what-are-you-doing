@@ -69,7 +69,7 @@
        * @param {Object} authResult Authorization result.
        */
        
-      
+      var ACCESS_TOKEN;
        
       function handleAuthResult(authResult) {
         var authorizeDiv = document.getElementById('authorize-div');
@@ -77,6 +77,7 @@
           // Hide auth UI, then load client library.
           authorizeDiv.style.display = 'none';
           console.log(authResult);
+          ACCESS_TOKEN = authResult.access_token;
           $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList?access_token="+authResult.access_token, function( data ) {
              data.items.forEach(function(calendar){
                if(calendar.accessRole=="owner" && calendar.selected){
@@ -170,6 +171,12 @@
             appendPre('Task Lists:');
             var taskLists = resp.items;
             if (taskLists && taskLists.length > 0) {
+              taskLists.forEach(function(task){
+                console.log(item.title)
+                $.get( task.selfLink+"?access_token="+ACCESS_TOKEN, function( data ) {
+                    console.log(data);  
+                });
+              })
               /*
               for (var i = 0; i < taskLists.length; i++) {
                 var taskList = taskLists[i];
