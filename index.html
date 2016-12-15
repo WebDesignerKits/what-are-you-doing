@@ -105,7 +105,7 @@
                   <h2 class="project-tagline"></h2>
                   <input placeholder="What are you doing?" id="description${tag}" value="${description}" name="doing" style="border-radius:30px; padding:20px; border:none; text-align:center; width:100%; max-width:400px; color:black; margin-bottom:20px;" type="text" />
                   <span class="btn" id="button${tag}" onclick="startButton(this,'${calendar.id}')" style="width:160px; cursor:pointer;">Start</span>
-                  <h2 id="created${tag}" style="display:none;">Event created!</h2>
+                  <span id="created${tag}" style="display:none; color:white; font-size:18px;">Event created!</span>
                 </section>
                  `;
                  $('#theCalendars').append(template);
