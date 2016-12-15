@@ -81,6 +81,21 @@
              data.items.forEach(function(calendar){
                if(calendar.accessRole=="owner" && calendar.selected){
                  tag = calendar.id.substring(0,8);
+                 
+                 CALENDAR_EVENTS["CALENDAR_EVENT"+tag] = {
+                    'summary': localStorage.getItem("summary"+tag),
+                    'location': '',
+                    'description': 'I did this',
+                    'start': {
+                      'dateTime': localStorage.getItem("start"+tag);,
+                    },
+                    'end': {
+                      'dateTime': localStorage.getItem("end"+tag);,
+                    }
+                  };
+                 
+                 var buttonState = localStorage.getItem("button"+tag);
+                 
                  var template = `
                  <section class="page-header" style="background:${calendar.backgroundColor};">
                   <h1 class="project-name">${calendar.summary}</h1>
@@ -90,6 +105,11 @@
                 </section>
                  `;
                  $('#theCalendars').append(template);
+                 if(buttonState == "finish"){
+                   setButtonFinish($("#button"+tag)[0],id,tag);
+                 }else{
+                   setButtonStart($("#button"+tag)[0],id,tag);
+                 }
                }
              }); 
              console.log(data)
@@ -170,17 +190,7 @@
         pre.appendChild(textContent);
       }
 
-var CALENDAR_EVENT = {
-  'summary': 'Basic event',
-  'location': '',
-  'description': 'I did this',
-  'start': {
-    'dateTime': '2015-05-28T09:00:00-07:00',
-  },
-  'end': {
-    'dateTime': '2015-05-28T17:00:00-07:00',
-  }
-};
+var CALENDAR_EVENTS = {};
 
 
 
@@ -195,10 +205,9 @@ var CALENDAR_EVENT = {
           // get the description
           localStorage.setItem("summary"+tag, $('#description'+tag).val());
           localStorage.setItem("start"+tag, moment().format());
-          $("#button"+tag).html('Finish');
-          that = obj;
-          $("#button"+tag).addClass("finish");
-          $("#button"+tag)[0].onclick = function(){ finishButton(that,id); }
+          localStorage.setItem("button"+tag,"finish");
+
+          setButtonFinish(obj,id,tag)
         }else{
           alert('You need to authorize Google Calendars! Read below for instructions.')
         }
@@ -207,19 +216,35 @@ var CALENDAR_EVENT = {
       function finishButton(obj,id){
          var id = id || 'primary';
          tag = id.substring(0,8);
-         CALENDAR_EVENT['summary'] = localStorage.getItem("summary"+tag);
-         CALENDAR_EVENT['start']['dateTime'] = localStorage.getItem("start"+tag);
-         CALENDAR_EVENT['end']['dateTime'] = moment().format();
-          console.log(CALENDAR_EVENT);
+         CALENDAR_EVENTS["CALENDAR_EVENT"+tag]['summary'] = localStorage.getItem("summary"+tag);
+         CALENDAR_EVENTS["CALENDAR_EVENT"+tag]['start']['dateTime'] = localStorage.getItem("start"+tag);
+         CALENDAR_EVENTS["CALENDAR_EVENT"+tag]['end']['dateTime'] = moment().format();
+          console.log(CALENDAR_EVENTS["CALENDAR_EVENT"+tag]);
           console.log(id);
           var request = gapi.client.calendar.events.insert({
             'calendarId': id,
-            'resource': CALENDAR_EVENT
+            'resource': CALENDAR_EVENTS["CALENDAR_EVENT"+tag]
           });
           
           request.execute(function(event) {
             appendPre('Event created: ' + event.htmlLink);
           });
+          
+        localStorage.setItem("summary"+tag,"");
+        localStorage.setItem("start"+tag,"");
+        localStorage.setItem("end"+tag,"");
+        localStorage.setItem("button"+tag,"start");
+        
+        setButtonStart(obj,id,tag)
+      }
+      
+      function setButtonFinish(obj,id,tag){
+          $("#button"+tag).html('Finish');
+          that = obj;
+          $("#button"+tag).addClass("finish");
+          $("#button"+tag)[0].onclick = function(){ finishButton(that,id); }
+      }
+      function setButtonStart(obj,id,tag){
         $('#description'+tag).val("");
         $("#button"+tag).html('Start');
         that = obj;
