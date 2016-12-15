@@ -81,7 +81,7 @@
              data.items.forEach(function(calendar){
                if(calendar.accessRole=="owner" && calendar.selected){
                  tag = calendar.id.substring(0,8);
-                 
+                 id = calendar.id;
                  CALENDAR_EVENTS["CALENDAR_EVENT"+tag] = {
                     'summary': localStorage.getItem("summary"+tag),
                     'location': '',
