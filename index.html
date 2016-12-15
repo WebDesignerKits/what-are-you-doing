@@ -94,6 +94,9 @@
                     }
                   };
                  
+                 console.log("Calendar_EVENTS["+"CALENDAR_EVENT"+tag+"] set");
+                 console.log(CALENDAR_EVENTS["CALENDAR_EVENT"+tag]);
+                 
                  var buttonState = localStorage.getItem("button"+tag);
                  var description = localStorage.getItem("summary"+tag);
                  var template = `
