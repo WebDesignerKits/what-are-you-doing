@@ -172,7 +172,7 @@
             var taskLists = resp.items;
             if (taskLists && taskLists.length > 0) {
               taskLists.forEach(function(task){
-                console.log(item.title)
+                console.log(task.title)
                 $.get( task.selfLink+"?access_token="+ACCESS_TOKEN, function( data ) {
                     console.log(data);  
                 });
