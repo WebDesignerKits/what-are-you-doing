@@ -7,14 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script data-require="jquery@*" data-semver="3.0.0" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.js"></script>
     <script data-require="moment.js@*" data-semver="2.14.1" src="https://npmcdn.com/moment@2.14.1"></script>
+     <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+          
     <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/normalize.css" media="screen" />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/stylesheet.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/github-light.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    
     <style>
     #description:focus{
       outline:none;
+    }
+    h3{
+      font-size:18px; padding-top:20px; display:inline-block;
     }
       .btn {
         background: #e0e0e0;
@@ -388,7 +398,7 @@
                   $.get( path, function( data ) {
                     console.log(tasklist.title)
                     var temp = `
-                      <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <i style="margin-left:10px;" onclick="TASKAPI.addTask('${hasCalendar}','${tasklist.id}',this,event)" class="fa fa-plus" aria-hidden="true"></i></h3><div class="tasks"></div></div>
+                      <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <a  style="margin-left:8px; position:relative; top:-3px; text-align:center; width:25px; height:25px; background:#159957;" onclick="TASKAPI.addTask('${hasCalendar}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-light" aria-hidden="true"><span  style="position:relative; top:-7px; font-weight:100;">+</span></a></h3><div class="tasks"></div></div>
                     `;
                     $("#tasks").append(temp);
                     tag = hasCalendar.substring(0,8);
