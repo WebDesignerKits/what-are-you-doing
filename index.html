@@ -67,6 +67,54 @@
       }
       var ACCESS_TOKEN;
       var CALENDAR_NAMES = []; 
+      
+      var TASKAPI = {
+  "key":"AIzaSyBwRp5_WwKljeoKEWb9IMpWSVaHFzZDIas",
+  "createList":function(name){
+    $.ajax({ 
+            type: 'POST',
+            url: "https://www.googleapis.com/tasks/v1/users/@me/lists?key="+TASKAPI.key,
+            headers: {
+                "authorization":"Bearer "+ACCESS_TOKEN,
+                "Content-Type":"application/json"
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
+            },
+            data: JSON.stringify({"title":name})
+        }).done(function(data) { 
+            console.log("list created: "+name);
+        });
+  },
+  "deleteTask":function(taskListID,taskID,obj){
+    path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
+    $.ajax({ 
+            type: 'DELETE',
+            url: path,
+            headers: {
+                "authorization":"Bearer "+ACCESS_TOKEN,
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
+            }
+        }).done(function(data) { 
+            console.log("task deleted: ");
+            $(obj).addClass('fade');
+            $(obj).fadeTo(400,0,function(){
+                $(this).remove();
+            });
+        });
+  },
+  "log":function(taskListID,taskID,obj){
+    alert(taskListID+" "+taskID+" "+obj)
+  }
+}    
+      
+      
       function handleAuthResult(authResult) {
         var authorizeDiv = document.getElementById('authorize-div');
         if (authResult && !authResult.error) {
@@ -147,51 +195,7 @@
         return calendarExists;
       } 
       
-var TASKAPI = {
-  "key":"AIzaSyBwRp5_WwKljeoKEWb9IMpWSVaHFzZDIas",
-  "createList":function(name){
-    $.ajax({ 
-            type: 'POST',
-            url: "https://www.googleapis.com/tasks/v1/users/@me/lists?key="+TASKAPI.key,
-            headers: {
-                "authorization":"Bearer "+ACCESS_TOKEN,
-                "Content-Type":"application/json"
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               console.log(textStatus);
-               console.log(errorThrown);
-               console.log(XMLHttpRequest);
-            },
-            data: JSON.stringify({"title":name})
-        }).done(function(data) { 
-            console.log("list created: "+name);
-        });
-  },
-  "deleteTask":function(taskListID,taskID,obj){
-    path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
-    $.ajax({ 
-            type: 'DELETE',
-            url: path,
-            headers: {
-                "authorization":"Bearer "+ACCESS_TOKEN,
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               console.log(textStatus);
-               console.log(errorThrown);
-               console.log(XMLHttpRequest);
-            }
-        }).done(function(data) { 
-            console.log("task deleted: ");
-            $(obj).addClass('fade');
-            $(obj).fadeTo(400,0,function(){
-                $(this).remove();
-            });
-        });
-  },
-  "log":function(taskListID,taskID){
-    alert(taskListID+" "+taskID)
-  }
-}      
+  
               
 
       function listTaskLists() {
@@ -236,7 +240,7 @@ var TASKAPI = {
                     if(data.items && data.items.length >0){
                         data.items.forEach(function(task){
                         var template = `
-                          <div class="task" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this)" data-taskID="${task.id}">${task.title}</div>
+                          <div class="task" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this)" data-taskID="${task.id}">${task.title}</div>
                         `;
                         $("#"+tasklist.id).append(template);
                     }); 
