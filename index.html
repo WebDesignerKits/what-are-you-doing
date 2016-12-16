@@ -191,7 +191,7 @@
             }; 
             template = `
              <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task" data-taskID="${task.id}">
-              <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:100%; display:inline-block">${title}</span>
+              <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:80%; display:inline-block">${title}</span>
               <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${taskListID}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
               <i class="fa fa-times" onclick="TASKAPI.deleteTask('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
               </div>
@@ -449,7 +449,7 @@
                         var buttonState = localStorage.getItem("button_"+tag+"_"+task.id);
                         var template = `
                           <div id="taskwrap_${tasklist.id}_${task.id}" class="task" data-taskID="${task.id}">
-                          <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:100%; display:inline-block">${title}</span>
+                          <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:80%; display:inline-block">${title}</span>
                           <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${tasklist.id}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
                           </div>
