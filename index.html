@@ -402,7 +402,17 @@
                   $.get( path, function( data ) {
                     console.log(tasklist.title)
                     var temp = `
-                      <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <span style="margin-left:8px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957;" onclick="TASKAPI.addTask('${hasCalendar}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-light" aria-hidden="true"><span  style="position:relative; top:-5px; font-weight:100;">+</span></span></h3><div class="tasks"></div></div>
+                      <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957;" onclick="TASKAPI.addTask('${hasCalendar}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-light" aria-hidden="true">
+                      <?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 212 212" style="width:30%; height:30%; position:absolute; top:40%; left:33%; enable-background:new 0 0 212 212;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;}
+</style>
+<rect x="98.5" class="st0" width="27" height="212"/>
+<rect x="98.5" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)" class="st0" width="27" height="212"/>
+</svg>
+                      </span></h3><div class="tasks"></div></div>
                     `;
                     $("#tasks").append(temp);
                     tag = hasCalendar.substring(0,8);
