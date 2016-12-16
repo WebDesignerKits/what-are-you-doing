@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/stylesheet.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="https://webdesignerkits.github.io/what-are-you-doing/stylesheets/github-light.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
     <style>
     #description:focus{
       outline:none;
@@ -46,7 +47,9 @@
       .task{
         padding:10px; border:1px solid #ddd;
         border-radius:5px; margin-bottom:5px;
+        position:relative;
       }
+
       .fade{
         background:#ddd;
       }
@@ -240,7 +243,9 @@
                     if(data.items && data.items.length >0){
                         data.items.forEach(function(task){
                         var template = `
-                          <div class="task" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this)" data-taskID="${task.id}">${task.title}</div>
+                          <div class="task" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this)" data-taskID="${task.id}">${task.title}
+                          <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
+                          </div>
                         `;
                         $("#"+tasklist.id).append(template);
                     }); 
