@@ -96,8 +96,6 @@
         });
   },
   "deleteTask":function(taskListID,taskID,obj,e){
-    e.preventDefault();
-    e.stopPropagation();
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
             type: 'DELETE',
@@ -247,9 +245,7 @@
     localStorage.setItem("button_"+tag+"_"+taskID,"start");
     
     // delete the task div
-    $("#button_"+tag+"_"+taskID).parent().fadeTo(500,0,function(){
-      $("#button_"+tag+"_"+taskID).parent().remove();
-    });
+    TASKAPI.deleteTask(taskListID,taskID,obj,null);
     
   },
   "setButtonFinish":function(taskListID,taskID,obj){
