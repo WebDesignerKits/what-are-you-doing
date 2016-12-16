@@ -242,8 +242,12 @@
                     $("#tasks").append(temp);
                     if(data.items && data.items.length >0){
                         data.items.forEach(function(task){
+                          title = task.title;
+                          if(title==""){
+                            title="&nbsp;";
+                          }
                         var template = `
-                          <div class="task" data-taskID="${task.id}">${task.title}
+                          <div class="task" data-taskID="${task.id}">${title}
                           <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
                           </div>
                         `;
