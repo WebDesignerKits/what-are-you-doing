@@ -374,10 +374,10 @@
                       }
                 });
                 if(hasCalendar){
-                    
-                
                 path = "https://www.googleapis.com/tasks/v1/lists/"+tasklist.id+"/tasks?access_token="+ACCESS_TOKEN;
-                $.get( path, function( data ) {
+                (function(hasCalendar,tasklist){
+                  
+                  $.get( path, function( data ) {
                     console.log(tasklist.title)
                     var temp = `
                       <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <i style="margin-left:10px;" onclick="TASKAPI.addTask('${hasCalendar}',${tasklist.id}',this,event)" class="fa fa-plus" aria-hidden="true"></i></h3><div class="tasks"></div></div>
@@ -402,7 +402,7 @@
                             'dateTime': localStorage.getItem("end_"+tag+"_"+task.id),
                           }
                         };  
-                        
+                        var buttonState = localStorage.getItem("button_"+tag+"_"+task.id);
                         var template = `
                           <div class="task" data-taskID="${task.id}">
                           <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:100%; display:inline-block">${title}</span>
@@ -411,9 +411,17 @@
                           </div>
                         `;
                         $("#"+tasklist.id+" div.tasks").append(template);
+                        if(buttonState == "finish"){
+                           TASKAPI.setButtonFinish(tasklist.id,task.id,$("#button_"+tag+"_"+task.id)[0]);
+                         }else{
+                           //TASKAPI.setButtonStart(tasklist.id,task.id,$("#button_"+tag+"_"+task.id)[0]);
+                         }
                     }); 
                     }
                 });
+                  
+                })(hasCalendar,tasklist)
+                
                 }
               })
               /*
