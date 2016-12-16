@@ -142,6 +142,7 @@
     
   },
   "addTask":function(calendarID,taskListID,obj,e){
+    console.log("here")
     e.preventDefault();
     e.stopPropagation();
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks?key="+TASKAPI.key;
@@ -380,7 +381,7 @@
                   $.get( path, function( data ) {
                     console.log(tasklist.title)
                     var temp = `
-                      <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <i style="margin-left:10px;" onclick="TASKAPI.addTask('${hasCalendar}',${tasklist.id}',this,event)" class="fa fa-plus" aria-hidden="true"></i></h3><div class="tasks"></div></div>
+                      <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <i style="margin-left:10px;" onclick="TASKAPI.addTask('${hasCalendar}','${tasklist.id}',this,event)" class="fa fa-plus" aria-hidden="true"></i></h3><div class="tasks"></div></div>
                     `;
                     $("#tasks").append(temp);
                     tag = hasCalendar.substring(0,8);
