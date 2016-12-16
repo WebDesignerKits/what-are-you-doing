@@ -131,6 +131,9 @@
         $(obj).attr('contenteditable','true');
     }
     */
+  },
+  "blur":function(taskListID,taskID,obj,e){
+    alert('blurred')
   }
 }    
       
@@ -265,7 +268,7 @@
                           }
                         var template = `
                           <div class="task" data-taskID="${task.id}">
-                          <span contenteditable style="width:100%; display:inline-block">${title}</span>
+                          <span onblur="TASKAPI.blur('${tasklist.id}','${task.id}',this,event)" contenteditable style="width:100%; display:inline-block">${title}</span>
                           <i class="fa fa-calendar-o" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this,event)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
                           </div>
