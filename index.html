@@ -398,7 +398,7 @@
                   $.get( path, function( data ) {
                     console.log(tasklist.title)
                     var temp = `
-                      <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <a  style="margin-left:8px; position:relative; top:-3px; text-align:center; width:25px; height:25px; background:#159957;" onclick="TASKAPI.addTask('${hasCalendar}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-light" aria-hidden="true"><span  style="position:relative; top:-7px; font-weight:100;">+</span></a></h3><div class="tasks"></div></div>
+                      <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <span style="margin-left:8px; position:relative; top:-3px; text-align:center; width:25px; height:25px; background:#159957;" onclick="TASKAPI.addTask('${hasCalendar}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-light" aria-hidden="true"><span  style="position:relative; top:-7px; font-weight:100;">+</span></span></h3><div class="tasks"></div></div>
                     `;
                     $("#tasks").append(temp);
                     tag = hasCalendar.substring(0,8);
