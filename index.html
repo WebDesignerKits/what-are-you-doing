@@ -243,7 +243,7 @@
                     if(data.items && data.items.length >0){
                         data.items.forEach(function(task){
                         var template = `
-                          <div class="task" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this)" data-taskID="${task.id}">${task.title}
+                          <div class="task" data-taskID="${task.id}">${task.title}
                           <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
                           </div>
                         `;
