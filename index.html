@@ -106,8 +106,8 @@
             }
         }).done(function(data) { 
             console.log("task deleted: ");
-            $(obj).addClass('fade');
-            $(obj).fadeTo(400,0,function(){
+            $(obj).parent().addClass('fade');
+            $(obj).parent().fadeTo(400,0,function(){
                 $(this).remove();
             });
         });
