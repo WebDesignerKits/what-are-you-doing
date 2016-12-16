@@ -284,9 +284,9 @@
           $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList?access_token="+authResult.access_token, function( data ) {
              
              data.items.forEach(function(calendar){
-               if(calendar.accessRole=="owner" && calendar.selected){
-                 tag = calendar.id.substring(0,8);
-
+               if(calendar.accessRole=="owner"){
+                 tag = calendar.id.substring(0,8); 
+ 
                  CALENDAR_NAMES.push({"summary":calendar.summary,"tag":tag,"id":calendar.id});
 
                  id = calendar.id;
@@ -361,17 +361,13 @@
       function listTaskLists() {
         $("#tasks").html(" "); 
         var request = gapi.client.tasks.tasklists.list({
-            'maxResults': 10
+            'maxResults': 100
           });
           
           
           request.execute(function(resp) {
             appendPre('Task Lists:');
             var taskLists = resp.items;
-            console.log("TASK LISTS");
-            console.log(taskLists);
-            console.log(CALENDAR_NAMES)
-            console.log(taskLists)
             if(taskLists && taskLists.length > 0) {
               CALENDAR_NAMES.forEach(function(cal){
                   hasList = false;
