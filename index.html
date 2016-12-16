@@ -91,7 +91,9 @@
             console.log("list created: "+name);
         });
   },
-  "deleteTask":function(taskListID,taskID,obj){
+  "deleteTask":function(taskListID,taskID,obj,e){
+    e.preventDefault();
+    e.stopPropagation();
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
             type: 'DELETE',
@@ -112,7 +114,9 @@
             });
         });
   },
-  "log":function(taskListID,taskID,obj){
+  "log":function(taskListID,taskID,obj,e){
+    e.preventDefault();
+    e.stopPropagation();
     alert(taskListID+" "+taskID+" "+obj)
   }
 }    
@@ -247,8 +251,9 @@
                             title="&nbsp;";
                           }
                         var template = `
-                          <div class="task" data-taskID="${task.id}">${title}
-                          <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
+                          <div class="task" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this,event)" data-taskID="${task.id}">${title}
+                          <i class="fa fa-calendar-o" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this,event)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
+                          <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
                           </div>
                         `;
                         $("#"+tasklist.id).append(template);
