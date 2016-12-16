@@ -167,6 +167,17 @@
               title="&nbsp;";
             }
             tag = calendarID.substring(0,8);
+            CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+task.id] = {
+              'summary': title,
+              'location': '',
+              'description': '',
+              'start': {
+                'dateTime': '',
+              },
+              'end': {
+                'dateTime': '',
+              }
+            }; 
             template = `
              <div style="display:none" class="task" data-taskID="${task.id}">
               <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:100%; display:inline-block">${title}</span>
