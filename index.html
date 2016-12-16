@@ -124,9 +124,9 @@
             }
         }).done(function(data) { 
             console.log("task deleted: ");
-            $(obj).parent().addClass('fade');
-            $(obj).parent().fadeTo(400,0,function(){
-                $(obj).parent().remove();
+            $("#taskwrap_"+taskListID+"_"+taskID).addClass('fade');
+            $("#taskwrap_"+taskListID+"_"+taskID).fadeTo(400,0,function(){
+                $("#taskwrap_"+taskListID+"_"+taskID).remove();
             });
         });
   },
@@ -148,7 +148,7 @@
                console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
-            console.log("task updated: "+summary);
+            //console.log("task updated: "+summary);
         });
       
     
@@ -190,7 +190,7 @@
               }
             }; 
             template = `
-             <div style="display:none" class="task" data-taskID="${task.id}">
+             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task" data-taskID="${task.id}">
               <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:100%; display:inline-block">${title}</span>
               <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${taskListID}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
               <i class="fa fa-times" onclick="TASKAPI.deleteTask('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
@@ -243,8 +243,6 @@
      CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['summary'] = localStorage.getItem("summary_"+tag+"_"+taskID).replace("&nbsp;","");
      CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['start']['dateTime'] = localStorage.getItem("start_"+tag+"_"+taskID);
      CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['end']['dateTime'] = moment().format();
-      console.log(CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]);
-      console.log(id);
       var request = gapi.client.calendar.events.insert({
         'calendarId': id,
         'resource': CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]
@@ -314,7 +312,6 @@
                 </section>
                  `;
                  $('#theCalendars').append(template);
-                 console.log(calendar.summary+" section added");
                  if(buttonState == "finish"){
                    setButtonFinish($("#button"+tag)[0],id,tag);
                  }else{
@@ -397,7 +394,6 @@
                 (function(hasCalendar,tasklist){
                   
                   $.get( path, function( data ) {
-                    console.log(hasCalendar)
                     var temp = `
                       <div id="${tasklist.id}" data-calendarID="${hasCalendar.id}"><h3>${tasklist.title} <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-light" aria-hidden="true">
 <?xml version="1.0" encoding="utf-8"?>
@@ -434,7 +430,7 @@
                         };  
                         var buttonState = localStorage.getItem("button_"+tag+"_"+task.id);
                         var template = `
-                          <div class="task" data-taskID="${task.id}">
+                          <div id="taskwrap_${tasklist.id}_${task.id}" class="task" data-taskID="${task.id}">
                           <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:100%; display:inline-block">${title}</span>
                           <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${tasklist.id}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
