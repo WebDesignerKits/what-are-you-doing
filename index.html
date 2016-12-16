@@ -113,8 +113,69 @@
             console.log("task deleted: ");
             $(obj).parent().addClass('fade');
             $(obj).parent().fadeTo(400,0,function(){
-                $(this).remove();
+                $(obj).parent().remove();
             });
+        });
+  },
+  "updateTask":function(taskListID,taskID,obj){
+    console.log("update called");
+    summary = $(obj).html();
+    path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
+    $.ajax({ 
+            type: 'PUT',
+            url: path,
+            headers: {
+                "authorization":"Bearer "+ACCESS_TOKEN,
+                "Content-Type":"application/json"
+            },
+            data: JSON.stringify({"id":taskID,"title":summary}),
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
+            }
+        }).done(function(data) { 
+            console.log("task updated: "+summary);
+        });
+      
+    
+  },
+  "addTask":function(taskListID,obj,e){
+    e.preventDefault();
+    e.stopPropagation();
+    path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks?key="+TASKAPI.key;
+    $.ajax({ 
+            type: 'POST',
+            url: path,
+            headers: {
+                "authorization":"Bearer "+ACCESS_TOKEN,
+                "Content-Type":"application/json"
+
+            },
+            data: JSON.stringify({"title":""}),
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
+            }
+        }).done(function(task) { 
+            console.log(task);
+            title = task.title;
+            if(title==""){
+              title="&nbsp;";
+            }
+            template = `
+             <div style="display:none" class="task" data-taskID="${task.id}">
+              <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:100%; display:inline-block">${title}</span>
+              <i class="fa fa-calendar-o" onclick="TASKAPI.log('${taskListID}','${task.id}',this,event)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
+              <i class="fa fa-times" onclick="TASKAPI.deleteTask('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
+              </div>
+            `;
+            div = $(template);
+            $(obj).parent().parent().find("div.tasks").prepend(div);
+            div.fadeTo(1000,1);
+            div.find("span").focus();
+            
         });
   },
   "log":function(taskListID,taskID,obj,e){
@@ -135,6 +196,7 @@
   "blur":function(taskListID,taskID,obj,e){
     console.log('blurred')
   }
+ 
 }    
       
       
@@ -235,7 +297,7 @@
             console.log(taskLists);
             console.log(CALENDAR_NAMES)
             console.log(taskLists)
-            if (taskLists && taskLists.length > 0) {
+            if(taskLists && taskLists.length > 0) {
               CALENDAR_NAMES.forEach(function(cal){
                   hasList = false;
                   taskLists.forEach(function(tl){
@@ -248,16 +310,24 @@
                   TASKAPI.createList(cal.summary);
                   }else{ 
                   console.log(cal.summary+" doesn't need tasklist");  
-                  $('#section'+cal.tag).fadeTo(500,1);
+                  //$('#section'+cal.tag).fadeTo(500,1);
                   }
               });
               taskLists.forEach(function(tasklist){
-
+                hasCalendar = false;
+                CALENDAR_NAMES.forEach(function(cal){
+                      if(tasklist.title==cal.summary){
+                        hasCalendar = cal.summary;
+                      }
+                });
+                if(hasCalendar){
+                    
+                
                 path = "https://www.googleapis.com/tasks/v1/lists/"+tasklist.id+"/tasks?access_token="+ACCESS_TOKEN;
                 $.get( path, function( data ) {
                     console.log(tasklist.title)
                     var temp = `
-                      <div id="${tasklist.id}"><h3>${tasklist.title}</h3></div>
+                      <div id="${tasklist.id}"><h3>${tasklist.title} <i style="margin-left:10px;" onclick="TASKAPI.addTask('${tasklist.id}',this,event)" class="fa fa-plus" aria-hidden="true"></i></h3><div class="tasks"></div></div>
                     `;
                     $("#tasks").append(temp);
                     if(data.items && data.items.length >0){
@@ -268,15 +338,16 @@
                           }
                         var template = `
                           <div class="task" data-taskID="${task.id}">
-                          <span onblur="TASKAPI.blur('${tasklist.id}','${task.id}',this,event)" contenteditable style="width:100%; display:inline-block">${title}</span>
+                          <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:100%; display:inline-block">${title}</span>
                           <i class="fa fa-calendar-o" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this,event)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
                           </div>
                         `;
-                        $("#"+tasklist.id).append(template);
+                        $("#"+tasklist.id+" div.tasks").append(template);
                     }); 
                     }
                 });
+                }
               })
               /*
               for (var i = 0; i < taskLists.length; i++) {
