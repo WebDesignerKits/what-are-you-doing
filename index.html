@@ -49,6 +49,9 @@
         border-radius:5px; margin-bottom:5px;
         position:relative;
       }
+      .task span:focus{
+        outline:none;
+      }
 
       .fade{
         background:#ddd;
@@ -118,6 +121,16 @@
     e.preventDefault();
     e.stopPropagation();
     alert(taskListID+" "+taskID+" "+obj)
+  },
+  "toggleEditable":function(taskListID,taskID,obj,e){
+    /*
+    var value = $(obj).attr('contenteditable');
+    console.log(value)
+    if (value == 'false' || value == undefined) {
+            console.log("here")
+        $(obj).attr('contenteditable','true');
+    }
+    */
   }
 }    
       
@@ -251,7 +264,8 @@
                             title="&nbsp;";
                           }
                         var template = `
-                          <div class="task" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this,event)" data-taskID="${task.id}">${title}
+                          <div class="task" data-taskID="${task.id}">
+                          <span contenteditable style="width:100%; display:inline-block">${title}</span>
                           <i class="fa fa-calendar-o" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this,event)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
                           </div>
