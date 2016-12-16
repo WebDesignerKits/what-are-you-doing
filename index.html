@@ -43,6 +43,7 @@
         background-image: -o-linear-gradient(top, #50616b, #7f909c);
         background-image: linear-gradient(to bottom, #50616b, #7f909c);
         text-decoration: none;
+        color:white;
       }
       .task{
         padding:10px; border:1px solid #ddd;
@@ -73,7 +74,7 @@
       }
       var ACCESS_TOKEN;
       var CALENDAR_NAMES = []; 
-      
+      var CALENDAR_EVENTS = {};
       var TASKAPI = {
   "key":"AIzaSyBwRp5_WwKljeoKEWb9IMpWSVaHFzZDIas",
   "createList":function(name){
@@ -140,7 +141,7 @@
       
     
   },
-  "addTask":function(taskListID,obj,e){
+  "addTask":function(calendarID,taskListID,obj,e){
     e.preventDefault();
     e.stopPropagation();
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks?key="+TASKAPI.key;
@@ -164,10 +165,11 @@
             if(title==""){
               title="&nbsp;";
             }
+            tag = calendarID.substring(0,8);
             template = `
              <div style="display:none" class="task" data-taskID="${task.id}">
               <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:100%; display:inline-block">${title}</span>
-              <i class="fa fa-calendar-o" onclick="TASKAPI.log('${taskListID}','${task.id}',this,event)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
+              <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${taskListID}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
               <i class="fa fa-times" onclick="TASKAPI.deleteTask('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
               </div>
             `;
@@ -195,6 +197,57 @@
   },
   "blur":function(taskListID,taskID,obj,e){
     console.log('blurred')
+  },
+  "startButton":function(taskListID,taskID,obj){
+    var id = $("#"+taskListID).attr("data-calendarID");
+    tag = id.substring(0,8);
+    if(SYNCED_WITH_GOOGLE){
+      // get the time stamp
+      // get the description
+      localStorage.setItem("summary_"+tag+"_"+taskID, $(obj).parent().find("span").html());
+      localStorage.setItem("start_"+tag+"_"+taskID, moment().format());
+      localStorage.setItem("button_"+tag+"_"+taskID,"finish");
+      TASKAPI.setButtonFinish(taskListID,taskID,obj)
+    }else{
+      alert('You need to authorize Google Calendars! Read below for instructions.')
+    }
+  },
+  "finishButton":function(taskListID,taskID,obj){
+     var id = $("#"+taskListID).attr("data-calendarID");
+     tag = id.substring(0,8);
+     CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['summary'] = localStorage.getItem("summary_"+tag+"_"+taskID).replace("&nbsp;","");
+     CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['start']['dateTime'] = localStorage.getItem("start_"+tag+"_"+taskID);
+     CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['end']['dateTime'] = moment().format();
+      console.log(CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]);
+      console.log(id);
+      var request = gapi.client.calendar.events.insert({
+        'calendarId': id,
+        'resource': CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]
+      });
+      
+      request.execute(function(event) {
+        appendPre('Event created: ' + event.htmlLink);
+      });
+      
+    localStorage.setItem("summary_"+tag+"_"+taskID,"");
+    localStorage.setItem("start_"+tag+"_"+taskID,"");
+    localStorage.setItem("end_"+tag+"_"+taskID,"");
+    localStorage.setItem("button_"+tag+"_"+taskID,"start");
+    
+    // delete the task div
+    $("#button_"+tag+"_"+taskID).parent().fadeTo(500,0,function(){
+      $("#button_"+tag+"_"+taskID).parent().remove();
+    });
+    
+  },
+  "setButtonFinish":function(taskListID,taskID,obj){
+    var id = $("#"+taskListID).attr("data-calendarID");
+    tag = id.substring(0,8);
+    $("#button_"+tag+"_"+taskID).removeClass('fa-calendar-o');
+    $("#button_"+tag+"_"+taskID).addClass('fa-calendar-check-o');
+    that = obj;
+    $("#button_"+tag+"_"+taskID).parent().addClass("finish");
+    $("#button_"+tag+"_"+taskID)[0].onclick = function(){ TASKAPI.finishButton(taskListID,taskID,that); }
   }
  
 }    
@@ -212,7 +265,7 @@
                if(calendar.accessRole=="owner" && calendar.selected){
                  tag = calendar.id.substring(0,8);
 
-                 CALENDAR_NAMES.push({"summary":calendar.summary,"tag":tag});
+                 CALENDAR_NAMES.push({"summary":calendar.summary,"tag":tag,"id":calendar.id});
 
                  id = calendar.id;
                  CALENDAR_EVENTS["CALENDAR_EVENT"+tag] = {
@@ -317,7 +370,7 @@
                 hasCalendar = false;
                 CALENDAR_NAMES.forEach(function(cal){
                       if(tasklist.title==cal.summary){
-                        hasCalendar = cal.summary;
+                        hasCalendar = cal.id;
                       }
                 });
                 if(hasCalendar){
@@ -327,19 +380,33 @@
                 $.get( path, function( data ) {
                     console.log(tasklist.title)
                     var temp = `
-                      <div id="${tasklist.id}"><h3>${tasklist.title} <i style="margin-left:10px;" onclick="TASKAPI.addTask('${tasklist.id}',this,event)" class="fa fa-plus" aria-hidden="true"></i></h3><div class="tasks"></div></div>
+                      <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <i style="margin-left:10px;" onclick="TASKAPI.addTask('${hasCalendar}',${tasklist.id}',this,event)" class="fa fa-plus" aria-hidden="true"></i></h3><div class="tasks"></div></div>
                     `;
                     $("#tasks").append(temp);
+                    tag = hasCalendar.substring(0,8);
                     if(data.items && data.items.length >0){
                         data.items.forEach(function(task){
                           title = task.title;
                           if(title==""){
                             title="&nbsp;";
                           }
+                        
+                        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+task.id] = {
+                          'summary': localStorage.getItem("summary_"+tag+"_"+task.id),
+                          'location': '',
+                          'description': '',
+                          'start': {
+                            'dateTime': localStorage.getItem("start_"+tag+"_"+task.id),
+                          },
+                          'end': {
+                            'dateTime': localStorage.getItem("end_"+tag+"_"+task.id),
+                          }
+                        };  
+                        
                         var template = `
                           <div class="task" data-taskID="${task.id}">
                           <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:100%; display:inline-block">${title}</span>
-                          <i class="fa fa-calendar-o" onclick="TASKAPI.log('${tasklist.id}','${task.id}',this,event)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
+                          <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${tasklist.id}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px; color:#bbb;"></i>
                           </div>
                         `;
@@ -397,7 +464,6 @@
         pre.appendChild(textContent);
       }
     
-    var CALENDAR_EVENTS = {};
     function startButton(obj,id){
         var id = id || 'primary';
         tag = id.substring(0,8);
