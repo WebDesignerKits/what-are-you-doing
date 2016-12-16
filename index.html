@@ -166,7 +166,7 @@
             }
             tag = calendarID.substring(0,8);
             CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+task.id] = {
-              'summary': title,
+              'summary': title.replace("&nbsp;",""),
               'location': '',
               'description': '',
               'start': {
