@@ -354,7 +354,13 @@
       } 
       
   
-              
+            function compare(a,b) {
+              if (a.title < b.title)
+                return -1;
+              if (a.title > b.title)
+                return 1;
+              return 0;
+            }  
 
       function listTaskLists() {
         $("#tasks").html(" "); 
@@ -366,6 +372,15 @@
           request.execute(function(resp) {
             appendPre('Task Lists:');
             var taskLists = resp.items;
+            console.log("taskLists")
+            console.log(typeof taskLists)
+            console.log( taskLists)
+            TASKLISTS = [];
+            taskLists.forEach(function(tl){
+              TASKLISTS.push(tl);
+            });
+            taskLists = TASKLISTS;
+            taskLists.sort(compare)
             if(taskLists && taskLists.length > 0) {
               CALENDAR_NAMES.forEach(function(cal){
                   hasList = false;
@@ -383,6 +398,7 @@
                   }
               });
               taskLists.forEach(function(tasklist){
+                console.log(tasklist.title)
                 hasCalendar = false;
                 CALENDAR_NAMES.forEach(function(cal){
                       if(tasklist.title==cal.summary){
@@ -393,8 +409,7 @@
                 path = "https://www.googleapis.com/tasks/v1/lists/"+tasklist.id+"/tasks?access_token="+ACCESS_TOKEN;
                 (function(hasCalendar,tasklist){
                   
-                  $.get( path, function( data ) {
-                    var temp = `
+                  var temp = `
                       <div id="${tasklist.id}" data-calendarID="${hasCalendar.id}"><h3>${tasklist.title} <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-light" aria-hidden="true">
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -409,6 +424,9 @@
                       </span></h3><div class="tasks"></div></div>
                     `;
                     $("#tasks").append(temp);
+                    
+                  $.get( path, function( data ) {
+                    
                     tag = hasCalendar.id.substring(0,8);
                     if(data.items && data.items.length >0){
                         data.items.forEach(function(task){
