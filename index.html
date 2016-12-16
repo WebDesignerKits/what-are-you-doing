@@ -287,7 +287,7 @@
                if(calendar.accessRole=="owner"){
                  tag = calendar.id.substring(0,8); 
  
-                 CALENDAR_NAMES.push({"summary":calendar.summary,"tag":tag,"id":calendar.id});
+                 CALENDAR_NAMES.push(calendar);
 
                  id = calendar.id;
                  CALENDAR_EVENTS["CALENDAR_EVENT"+tag] = {
@@ -388,7 +388,7 @@
                 hasCalendar = false;
                 CALENDAR_NAMES.forEach(function(cal){
                       if(tasklist.title==cal.summary){
-                        hasCalendar = cal.id;
+                        hasCalendar = cal;
                       }
                 });
                 if(hasCalendar){
@@ -396,9 +396,9 @@
                 (function(hasCalendar,tasklist){
                   
                   $.get( path, function( data ) {
-                    console.log(tasklist.title)
+                    console.log(hasCalendar)
                     var temp = `
-                      <div id="${tasklist.id}" data-calendarID="${hasCalendar}"><h3>${tasklist.title} <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957;" onclick="TASKAPI.addTask('${hasCalendar}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-light" aria-hidden="true">
+                      <div id="${tasklist.id}" data-calendarID="${hasCalendar.id}"><h3 style="">${tasklist.title} <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957;" onclick="TASKAPI.addTask('${hasCalendar}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-light" aria-hidden="true">
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 212 212" style="width:100%; height:100%; enable-background:new 0 0 212 212;" xml:space="preserve">
@@ -412,7 +412,7 @@
                       </span></h3><div class="tasks"></div></div>
                     `;
                     $("#tasks").append(temp);
-                    tag = hasCalendar.substring(0,8);
+                    tag = hasCalendar.id.substring(0,8);
                     if(data.items && data.items.length >0){
                         data.items.forEach(function(task){
                           title = task.title;
