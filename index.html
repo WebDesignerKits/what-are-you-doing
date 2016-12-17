@@ -148,7 +148,15 @@
             console.log("list created: "+name);
         });
   },
+  "delete":function(taskListID,taskID,obj,e){
+    if($(obj).parent().hasClass("normal")){
+      TASKAPI.deleteTask(taskListID,taskID,obj,e);
+    }else{
+      TASKAPI.setButtonStart(taskListID,taskID,obj);
+    }
+  },
   "deleteTask":function(taskListID,taskID,obj,e){
+    
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
             type: 'DELETE',
@@ -168,8 +176,9 @@
                 $("#taskwrap_"+taskListID+"_"+taskID).remove();
             });
         });
+    
   },
-  "updateTask":function(taskListID,taskID,obj){
+  "updateTask":function(taskListID,taskID,obj,cb){
     console.log("update called");
     summary = $(obj).html();
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
@@ -187,6 +196,9 @@
                console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
+          if(typeof cb == 'function'){
+            cb();
+          }
             //console.log("task updated: "+summary);
         });
       
@@ -232,7 +244,7 @@
              <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal" data-taskID="${task.id}">
               <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:80%; display:inline-block">${title}</span>
               <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${taskListID}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px;" aria-hidden="true"></i>
-              <i class="fa fa-times" onclick="TASKAPI.deleteTask('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
+              <i class="fa fa-times" onclick="TASKAPI.delete('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
               </div>
             `;
             div = $(template);
@@ -277,27 +289,29 @@
     }
   },
   "finishButton":function(taskListID,taskID,obj){
-     var id = $("#"+taskListID).attr("data-calendarID");
-     tag = id.substring(0,8);
-     CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['summary'] = localStorage.getItem("summary_"+tag+"_"+taskID).replace("&nbsp;","");
-     CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['start']['dateTime'] = localStorage.getItem("start_"+tag+"_"+taskID);
-     CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['end']['dateTime'] = moment().format();
-      var request = gapi.client.calendar.events.insert({
-        'calendarId': id,
-        'resource': CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]
-      });
+       localStorage.setItem("summary_"+tag+"_"+taskID,$("#taskwrap_"+taskListID+"_"+taskID+" span").html());
+      var id = $("#"+taskListID).attr("data-calendarID");
+       tag = id.substring(0,8);
+       CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['summary'] = localStorage.getItem("summary_"+tag+"_"+taskID).replace("&nbsp;","");
+       CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['start']['dateTime'] = localStorage.getItem("start_"+tag+"_"+taskID);
+       CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['end']['dateTime'] = moment().format();
+        var request = gapi.client.calendar.events.insert({
+          'calendarId': id,
+          'resource': CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]
+        });
+        
+        request.execute(function(event) {
+          appendPre('Event created: ' + event.htmlLink);
+        });
+        
+      localStorage.setItem("summary_"+tag+"_"+taskID,"");
+      localStorage.setItem("start_"+tag+"_"+taskID,"");
+      localStorage.setItem("end_"+tag+"_"+taskID,"");
+      localStorage.setItem("button_"+tag+"_"+taskID,"start");
       
-      request.execute(function(event) {
-        appendPre('Event created: ' + event.htmlLink);
-      });
-      
-    localStorage.setItem("summary_"+tag+"_"+taskID,"");
-    localStorage.setItem("start_"+tag+"_"+taskID,"");
-    localStorage.setItem("end_"+tag+"_"+taskID,"");
-    localStorage.setItem("button_"+tag+"_"+taskID,"start");
+      // delete the task div
+      TASKAPI.deleteTask(taskListID,taskID,obj,null);
     
-    // delete the task div
-    TASKAPI.deleteTask(taskListID,taskID,obj,null);
     
   },
   "setButtonFinish":function(taskListID,taskID,obj){
@@ -308,6 +322,16 @@
     that = obj;
     $("#taskwrap_"+taskListID+"_"+taskID).removeClass("normal");
     $("#button_"+tag+"_"+taskID)[0].onclick = function(){ TASKAPI.finishButton(taskListID,taskID,that); }
+  },
+  "setButtonStart":function(taskListID,taskID,obj){
+    var id = $("#"+taskListID).attr("data-calendarID");
+    tag = id.substring(0,8);
+    $("#button_"+tag+"_"+taskID).removeClass('fa-calendar-check-o');
+    $("#button_"+tag+"_"+taskID).addClass('fa-calendar-o');
+    that = obj;
+    $("#taskwrap_"+taskListID+"_"+taskID).addClass("normal");
+    $("#button_"+tag+"_"+taskID)[0].onclick = function(){ TASKAPI.startButton(taskListID,taskID,that); }
+    localStorage.setItem("button_"+tag+"_"+taskID,"start");
   }
  
 }    
@@ -507,7 +531,7 @@
                           <div id="taskwrap_${tasklist.id}_${task.id}" class="task normal" data-taskID="${task.id}">
                           <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:80%; display:inline-block">${title}</span>
                           <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${tasklist.id}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px; " aria-hidden="true"></i>
-                          <i class="fa fa-times" onclick="TASKAPI.deleteTask('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
+                          <i class="fa fa-times" onclick="TASKAPI.delete('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
                           </div>
                         `;
                         $("#"+tasklist.id+" div.tasks").append(template);
