@@ -37,9 +37,29 @@
     h3, .main-content h3{
       font-size:20px; padding-top:20px; display:inline-block;
       color:#4384F6;
+      margin-top:0px;
+    }
+    h2, .main-content h2{
+      color:#4384F6;
+      width:100%; text-align:center;
+      margin-top:0px;
+    }
+    .main-content p {
+      margin-bottom:20px;
     }
     body{
       font-size:16px;
+    }
+    .main-content table td{
+      border:none;
+      vertical-align:top;
+      text-align:left;
+      padding-right:0px;
+      padding-left:0px;
+    }
+    .main-content table td:first-of-type{
+      padding-right:10px;
+
     }
       .btn {
         background: #e0e0e0;
@@ -82,6 +102,9 @@
 
       .fade{
         background:#ddd;
+      }
+      .main-content{
+        padding:15px;
       }
     </style>
     <script type="text/javascript">
@@ -600,26 +623,82 @@
     <img style="width:300px; position:relative; margin:auto;" src="http://calendartasks.com/logo.png"/> 
     </div>
     <br/>
-      
-      <h3>
-        <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true">
-          <span aria-hidden="true" class="octicon octicon-link"></span>
-        </a>
-
-How it works</h3>
-      <p>
-  This app records the start time and end time of whatever you are doing and submits it as an event to Google Calendar, allowing you to keep a record of what you did during the day.
-  </p>
-      <div id="authorize-div" style="display: none">
+      <h2>Calendar Tasks</h2>
+      <h3>Calendar Tasks</h3>
+      <p>A task list that automatically pushes finished tasks to Google Calendar as past events. </p>
+  <h3>How it works</h3>
+  <div id="authorize-div" style="display: none">
         <span>Authorize access to Google Calendar API</span>
         <!--Button for the user to click to initiate auth sequence -->
         <button id="authorize-button" onclick="handleAuthClick(event)">
         Authorize
       </button>
       </div>
+      
+      <p>
+        Create new task lists by creating new calendars in <a href="https://calendar.google.com">Google Calendar</a>. These become your task lists. (You may need to refresh a few times for them to sync.) 
+      </p>
+      <p>
+        Add new tasks by tapping 
+        <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6"  class="btn-floating waves-effect waves-light" aria-hidden="true">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 212 212" style="width:100%; height:100%; enable-background:new 0 0 212 212;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;}
+</style>
+<rect x="102.7" y="75" class="st0" width="6.7" height="62"/>
+<rect x="102.7" y="75" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)" class="st0" width="6.7" height="62"/>
+</svg>
+
+                      </span>
+                      
+      </p>
+      <p>
+        Name or edit your tasks by tapping inside them. 
+      </p>
+      <p>To remove an unwanted task tap <i class="fa fa-times" aria-hidden="true" style="position:relative; top:3px; font-size:27px; color:#bbb;"></i></p>
+      <p>To start a task tap                           
+      <i class="fa fa-calendar-o" style="position:relative; left:0px; top:3px; margin-left:2px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
+      </p>
+      <p>
+        To finish a task and record it as an event in Google Calendar, tap again <i class="fa fa-calendar-check-o finish" style="position:relative; left:0px; top:3px; margin-left:2px; font-size:23px; padding:3px; padding-right:1px; padding-top:2px; color:#bbb; color:white;" aria-hidden="true"></i>
+      </p>
+      
+      <h3>Calendar Suggestions</h3>
+        <table>
+          <tr>
+            <td>SLEEP&nbsp;&nbsp;-</td>
+            <td>Start a task each night and complete it when you wake up. Use it to see your sleeping pattern throughout the week.</td>
+          </tr>
+        </table>
+        <table>
+          <tr>
+            <td>FOOD&nbsp;&nbsp;-</td>
+            <td>Start a task and complete it everytime you eat something. Use it as a food journal for dieting.</td>
+          </tr>
+        </table>
+        <table>
+          <tr>
+            <td>WORKOUT&nbsp;&nbsp;-</td>
+            <td>Start a task when you begin your workout and complete it when you finish. Use it as a fitness journal.</td>
+          </tr>
+        </table>
+        <table>
+          <tr>
+            <td>OTHER&nbsp;&nbsp;-</td>
+            <td>Use this task list for tasks or events that wouldn't logically fit in another category.</td>
+          </tr>
+        </table>
+        <table>
+          <tr>
+            <td>SCHEDULE&nbsp;&nbsp;-</td>
+            <td>Don't add tasks to this calendar. Instead, schedule your day with it in Google Calendars, then use other calendars to complete your tasks. At the end of the day compare what you scheduled with the tasks you completed.</td>
+          </tr>
+        </table>
+        
       <!--<pre id="output"></pre>-->
       
-      
+      <div class="site-footer"></div>
       <div id="tasks">
         
       </div>
@@ -628,19 +707,9 @@ How it works</h3>
     
       
       <footer class="site-footer">
-        <span class="site-footer-owner">
-          <a href="https://github.com/WebDesignerKits/what-are-you-doing">What-are-you-doing</a>
-
- is maintained by                     <a href="https://github.com/WebDesignerKits">WebDesignerKits</a>
-
-.</span>
-        <span class="site-footer-credits">This page was generated by                     <a href="https://pages.github.com">GitHub Pages</a>
-
- using the                     <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a>
-
- by                     <a href="https://twitter.com/jasonlong">Jason Long</a>
-
-.</span>
+        
+        ads
+        
       </footer>
     </section>
     <section id="theCalendars">
