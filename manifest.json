@@ -1,0 +1,17 @@
+{
+  "name": "Calendar Tasks",
+  "icons": [{
+        "src": "57.png",
+        "sizes": "57x57",
+      }, {
+        "src": "72.png",
+        "sizes": "72x72"
+      }, {
+        "src": "114.png",
+        "sizes": "114x114"
+      }, {
+        "src": "144.png",
+        "sizes": "144x144"
+      }],
+  "display": "fullscreen"
+}
