@@ -37,8 +37,10 @@
     h3, .main-content h3{
       font-size:20px; padding-top:20px; display:inline-block;
       color:#4384F6;
+
       margin-top:0px;
     }
+    
     h2, .main-content h2{
       color:#4384F6;
       width:100%; text-align:center;
@@ -448,12 +450,12 @@
                 (function(hasCalendar,tasklist){
                   
                   var temp = `
-                      <div id="${tasklist.id}" data-calendarID="${hasCalendar.id}"><h3 style="color:#4384F6">${tasklist.title} <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-light" aria-hidden="true">
+                      <div id="${tasklist.id}" data-calendarID="${hasCalendar.id}"><h3 style="color:white; background:#4384F6; padding:10px; padding-left:25px; padding-right:10px; padding-bottom:5px; position:relative; left:-25px; border-top-right-radius:25px; border-bottom-right-radius:25px; ">${tasklist.title} <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-dark" aria-hidden="true">
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 212 212" style="width:100%; height:100%; enable-background:new 0 0 212 212;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#FFFFFF;}
+	.st0{fill:#FFFFFF; fill:#4384F6;}
 </style>
 <rect x="102.7" y="75" class="st0" width="6.7" height="62"/>
 <rect x="102.7" y="75" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)" class="st0" width="6.7" height="62"/>
@@ -742,7 +744,7 @@
       
       <div id="showInstructions" style="display:none; margin-bottom:50px;">
       <p style="position:relative;">
-        <i onclick="showInstructions();" style="font-size:37px; color:#4384F6; position:absolute; top:-10px; left:30px;" class="fa fa-caret-down" aria-hidden="true"></i>
+        <i onclick="showInstructions();" style="font-size:37px; color:#4384F6; position:absolute; top:-10px; left:0px;" class="fa fa-caret-down" aria-hidden="true"></i>
       </p>
       </div>
       <!--<pre id="output"></pre>-->
