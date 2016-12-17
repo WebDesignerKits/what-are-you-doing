@@ -338,7 +338,7 @@
     var bgColor = $("#"+taskListID+" h3").css("background");
     var taskNotes = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes");
     console.log(taskNotes)
-    if(taskNotes == undefined){
+    if(taskNotes == "undefined"){
       taskNotes = "";
     }
     var taskDue = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskDue");
