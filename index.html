@@ -4,32 +4,27 @@
   <head>
     <meta charset="UTF-8" />
     <!-- <link rel="manifest" href="manifest.json"> -->
-    <meta property="og:image" content="http://calendartasks.com/logo.png"/> 
-    <meta property="og:title" content="Calendar Tasks"/>
-    <meta property="og:description" content="Push completed tasks to your Google Calendar"/>
+    <meta property="og:image" content="http://calendartasks.com/logo.png" />
+    <meta property="og:title" content="Calendar Tasks" />
+    <meta property="og:description" content="Push completed tasks to your Google Calendar" />
     <link rel="icon" type="image/png" href="http://calendartasks.com/favicon.png" />
-    
-<link rel="apple-touch-icon" sizes="57x57" href="http://calendartasks.com/57.png" />
-<link rel="apple-touch-icon" sizes="72x72" href="http://calendartasks.com/72.png" />
-<link rel="apple-touch-icon" sizes="114x114" href="http://calendartasks.com/114.png" />
-<link rel="apple-touch-icon" sizes="144x144" href="http://calendartasks.com/144.png" />
-
+    <link rel="apple-touch-icon" sizes="57x57" href="http://calendartasks.com/57.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="http://calendartasks.com/72.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="http://calendartasks.com/114.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="http://calendartasks.com/144.png" />
     <title>Calendar Tasks</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script data-require="jquery@*" data-semver="3.0.0" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.js"></script>
     <script data-require="moment.js@*" data-semver="2.14.1" src="https://npmcdn.com/moment@2.14.1"></script>
-     <!-- Compiled and minified CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
-
-  <!-- Compiled and minified JavaScript -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
-          
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css" />
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
     <link rel="stylesheet" type="text/css" href="http://calendartasks.com/stylesheets/normalize.css" media="screen" />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="http://calendartasks.com/stylesheets/stylesheet.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="http://calendartasks.com/stylesheets/github-light.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
-    
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
     <style>
     #description:focus{
       outline:none;
@@ -39,7 +34,9 @@
       color:#4384F6;
       margin-top:0px;
     }
-    
+    #slide-out li{
+      padding:0px 15px;
+    }
     h2, .main-content h2{
       color:#4384F6;
       width:100%; text-align:center;
@@ -241,10 +238,11 @@
               }
             }; 
             template = `
-             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal" data-taskID="${task.id}">
+             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal" data-taskID="${task.id}"  data-taskNotes="${task.notes}" data-taskDue="${task.due}">
               <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:80%; display:inline-block">${title}</span>
               <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${taskListID}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px;" aria-hidden="true"></i>
               <i class="fa fa-times" onclick="TASKAPI.delete('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
+              <i class="fa fa-clock-o" onclick="TASKAPI.prioritize('${taskListID}','${task.id}',this)" style="position:absolute; right:90px; top:9px; font-size:27px;" aria-hidden="true"></i>
               </div>
             `;
             div = $(template);
@@ -295,6 +293,8 @@
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['summary'] = localStorage.getItem("summary_"+tag+"_"+taskID).replace("&nbsp;","");
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['start']['dateTime'] = localStorage.getItem("start_"+tag+"_"+taskID);
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['end']['dateTime'] = moment().format();
+       CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['description'] = localStorage.getItem("description_"+tag+"_"+taskID);
+
         var request = gapi.client.calendar.events.insert({
           'calendarId': id,
           'resource': CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]
@@ -332,7 +332,97 @@
     $("#taskwrap_"+taskListID+"_"+taskID).addClass("normal");
     $("#button_"+tag+"_"+taskID)[0].onclick = function(){ TASKAPI.startButton(taskListID,taskID,that); }
     localStorage.setItem("button_"+tag+"_"+taskID,"start");
-  }
+  },
+  "prioritize":function(taskListID,taskID,obj){
+    var listTitle = $("#"+taskListID+" h3 span.taskTitle").html();
+    var bgColor = $("#"+taskListID+" h3").css("background");
+    var taskNotes = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes");
+    console.log(taskNotes)
+    if(taskNotes == undefined){
+      taskNotes = "";
+    }
+    var taskDue = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskDue");
+    if(taskDue == undefined){
+      due = 0;
+    }else{
+    today = moment();
+    taskDue = moment(taskDue);
+    var duration = moment.duration(taskDue.diff(today));
+    var daysleft = duration.asDays();
+    due = daysleft;
+    }
+    var template = `
+    <div style="padding:15px; font-size:20px; background:${bgColor}; color:white;">${listTitle}</div>
+    <li>Notes <i class="fa fa-pencil" aria-hidden="true"></i><br/>
+    <textarea  onblur="TASKAPI.updateTaskNotes('${taskListID}','${taskID}',this.value)" style="border:1px solid #ddd; border-radius:5px; padding:0px 15px; height:300px">${taskNotes}</textarea>
+    </li>
+    <li><i class="fa fa-clock-o" aria-hidden="true"></i> Days left until task due:<br/>
+    <span onblur="TASKAPI.updateTaskDue('${taskListID}','${taskID}',this.innerHTML)" contentEditable style=" width:50px; padding:10px; border:1px solid #ddd; border-radius:5px; ">${due}</span>
+    
+    </li>
+    `;
+    $("#slide-out").html(template);
+    $('.button-collapse').sideNav('show');
+
+  },
+  "updateTaskDue":function(taskListID,taskID,val){
+    console.log("update called");
+    due = val;
+    /*
+    path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
+    $.ajax({ 
+            type: 'PUT',
+            url: path,
+            headers: {
+                "authorization":"Bearer "+ACCESS_TOKEN,
+                "Content-Type":"application/json"
+            },
+            data: JSON.stringify({"id":taskID,"title":summary}),
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
+            }
+        }).done(function(data) { 
+          if(typeof cb == 'function'){
+            cb();
+          }
+            //console.log("task updated: "+summary);
+        });
+    */
+  },
+  "updateTaskNotes":function(taskListID,taskID,val){
+    console.log("update notes called");
+    notes = val;
+    var id = $("#"+taskListID).attr("data-calendarID");
+    tag = id.substring(0,8);
+    
+    $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes",notes);
+    localStorage.setItem("description_"+tag+"_"+taskID,notes);
+    
+    path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
+    $.ajax({ 
+            type: 'PUT',
+            url: path,
+            headers: {
+                "authorization":"Bearer "+ACCESS_TOKEN,
+                "Content-Type":"application/json"
+            },
+            data: JSON.stringify({"id":taskID,"notes":notes}),
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
+            }
+        }).done(function(data) { 
+          if(typeof cb == 'function'){
+            cb();
+          }
+            console.log(data);
+        });
+    
+    
+  },
  
 }    
       
@@ -473,7 +563,7 @@
                 (function(hasCalendar,tasklist){
                   
                   var temp = `
-                      <div id="${tasklist.id}" style="margin-bottom:15px;" data-calendarID="${hasCalendar.id}"><h3 style="color:white; background:#4384F6; background:${hasCalendar.backgroundColor}; padding:10px; padding-left:25px; padding-right:10px; padding-bottom:5px; position:relative; left:-25px; border-top-right-radius:25px; border-bottom-right-radius:25px; ">${tasklist.title} <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-dark" aria-hidden="true">
+                      <div id="${tasklist.id}" style="margin-bottom:15px;" data-calendarID="${hasCalendar.id}"><h3 style="color:white; background:#4384F6; background:${hasCalendar.backgroundColor}; padding:10px; padding-left:25px; padding-right:10px; padding-bottom:5px; position:relative; left:-25px; border-top-right-radius:25px; border-bottom-right-radius:25px; "><span class="taskTitle">${tasklist.title}</span> <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-dark" aria-hidden="true">
   <style>
   #${tasklist.id} div.task{
     background:${hasCalendar.backgroundColor};
@@ -518,7 +608,7 @@
                         CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+task.id] = {
                           'summary': localStorage.getItem("summary_"+tag+"_"+task.id),
                           'location': '',
-                          'description': '',
+                          'description': localStorage.getItem("description_"+tag+"_"+task.id),
                           'start': {
                             'dateTime': localStorage.getItem("start_"+tag+"_"+task.id),
                           },
@@ -528,17 +618,18 @@
                         };  
                         var buttonState = localStorage.getItem("button_"+tag+"_"+task.id);
                         var template = `
-                          <div id="taskwrap_${tasklist.id}_${task.id}" class="task normal" data-taskID="${task.id}">
+                          <div id="taskwrap_${tasklist.id}_${task.id}" class="task normal" data-taskID="${task.id}" data-taskNotes="${task.notes}" data-taskDue="${task.due}">
                           <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:80%; display:inline-block">${title}</span>
-                          <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${tasklist.id}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px; " aria-hidden="true"></i>
+                          <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${tasklist.id}','${task.id}',this)" style="position:absolute; right:47px; top:11px; font-size:23px; " aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.delete('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
+                          <i class="fa fa-clock-o" onclick="TASKAPI.prioritize('${tasklist.id}','${task.id}',this)" style="position:absolute; right:90px; top:9px; font-size:27px;" aria-hidden="true"></i>
                           </div>
                         `;
                         $("#"+tasklist.id+" div.tasks").append(template);
                         if(buttonState == "finish"){
                            TASKAPI.setButtonFinish(tasklist.id,task.id,$("#button_"+tag+"_"+task.id)[0]);
                          }else{
-                           //TASKAPI.setButtonStart(tasklist.id,task.id,$("#button_"+tag+"_"+task.id)[0]);
+                           TASKAPI.setButtonStart(tasklist.id,task.id,$("#button_"+tag+"_"+task.id)[0]);
                          }
                     }); 
                     }
@@ -654,16 +745,7 @@
         $("#button"+tag).removeClass("finish");
         $("#button"+tag)[0].onclick = function(){ startButton(that,id); }
       }
-    $(function(){
-      ins = localStorage.getItem("instructions");
-      if(ins=="hide"){
-        $("#instructions").hide();
-        $("#showInstructions").show();
-      }else{
-        $("#instructions").show();
-        $("#showInstructions").hide();
-      }
-    })
+   
     function hideInstructions(){
       $("#instructions").slideUp('slow');
       $("#showInstructions").fadeTo(500,1);
@@ -674,6 +756,18 @@
       $("#showInstructions").hide();
       localStorage.setItem("instructions","show");
     }
+    
+     $(function(){
+      ins = localStorage.getItem("instructions");
+      if(ins=="hide"){
+        $("#instructions").hide();
+        $("#showInstructions").show();
+      }else{
+        $("#instructions").show();
+        $("#showInstructions").hide();
+      }
+      $(".button-collapse").sideNav();
+    })
     </script>
     <script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
   </head>
@@ -688,134 +782,127 @@
   ga('create', 'UA-89087680-1', 'auto');
   ga('send', 'pageview');
 
-</script>
+    </script>
+    <ul id="slide-out" class="side-nav"></ul>
+    <a href="#" data-activates="slide-out" class="button-collapse"></a>
     <!--<section class="page-header">-->
     <!--  <h1 class="project-name">What are you doing?</h1>-->
     <!--  <h2 class="project-tagline"></h2>-->
     <!--</section>-->
     <section class="main-content">
-    <div style="width:100%; position:relative; text-align:center;">
-    <img style="width:300px; position:relative; margin:auto;" src="logo.png"/> 
-    </div>
-    <br/>
+      <div style="width:100%; position:relative; text-align:center;">
+        <img style="width:300px; position:relative; margin:auto;" src="logo.png" />
+      </div>
+      <br />
       <h2>Calendar Tasks</h2>
-      <div id="instructions"  style="display:none">
-      <h3>Calendar Tasks</h3>
-      <p>A task list that automatically pushes finished tasks to Google Calendar as past events. </p>
-  <h3>How it works</h3>
-  <div id="authorize-div" style="display: none">
-        <span>Authorize access to Google Calendar API</span>
-        <!--Button for the user to click to initiate auth sequence -->
-        <button id="authorize-button" onclick="handleAuthClick(event)">
+      <div id="instructions" style="display:none">
+        <h3>Calendar Tasks</h3>
+        <p>A task list that automatically pushes finished tasks to Google Calendar as past events. </p>
+        <h3>How it works</h3>
+        <div id="authorize-div" style="display: none">
+          <span>Authorize access to Google Calendar API</span>
+          <!--Button for the user to click to initiate auth sequence -->
+          <button id="authorize-button" onclick="handleAuthClick(event)">
         Authorize
       </button>
-      </div>
-      
-      <p>
-        Create new task lists by creating new calendars in <a href="https://calendar.google.com">Google Calendar</a>. These become your task lists. (You may need to refresh a few times for them to sync.) 
+        </div>
+        <p>
+        Create new task lists by creating new calendars in           <a href="https://calendar.google.com">Google Calendar</a>
+. These become your task lists. (You may need to refresh a few times for them to sync.) 
       </p>
-      <p>
+        <p>
         Add new tasks by tapping 
-        <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6"  class="btn-floating waves-effect waves-light" aria-hidden="true">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 212 212" style="width:100%; height:100%; enable-background:new 0 0 212 212;" xml:space="preserve">
-<style type="text/css">
+                  <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6" class="btn-floating waves-effect waves-light" aria-hidden="true">
+            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 212 212" style="width:100%; height:100%; enable-background:new 0 0 212 212;" xml:space="preserve">
+              <style type="text/css">
 	.st0{fill:#FFFFFF;}
-</style>
-<rect x="102.7" y="75" class="st0" width="6.7" height="62"/>
-<rect x="102.7" y="75" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)" class="st0" width="6.7" height="62"/>
-</svg>
-
-                      </span>
-                      
-      </p>
-      <p>
+              </style>
+              <rect x="102.7" y="75" class="st0" width="6.7" height="62"></rect>
+              <rect x="102.7" y="75" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)" class="st0" width="6.7" height="62"></rect>
+            </svg>
+          </span>
+        </p>
+        <p>
         Name or edit your tasks by tapping inside them. 
       </p>
-      <p>To remove an unwanted task tap <i class="fa fa-times" aria-hidden="true" style="position:relative; top:3px; font-size:27px; color:#bbb;"></i></p>
-      <p>To start a task tap                           
-      <i class="fa fa-calendar-o" style="position:relative; left:0px; top:3px; margin-left:2px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
-      </p>
-      <p>
-        To finish a task and record it as an event in Google Calendar, tap again <i class="fa fa-calendar-check-o finish" style="position:relative; left:0px; top:3px; margin-left:2px; font-size:23px; padding:3px; padding-right:1px; padding-top:2px; color:#bbb; color:white;" aria-hidden="true"></i>
-      </p>
-      
-      <h3>Calendar Suggestions</h3>
+        <p>To remove an unwanted task tap           <i class="fa fa-times" aria-hidden="true" style="position:relative; top:3px; font-size:27px; color:#bbb;"></i>
+        </p>
+        <p>To start a task tap                           
+                <i class="fa fa-calendar-o" style="position:relative; left:0px; top:3px; margin-left:2px; font-size:23px; color:#bbb;" aria-hidden="true"></i>
+        </p>
+        <p>
+        To finish a task and record it as an event in Google Calendar, tap again           <i class="fa fa-calendar-check-o finish" style="position:relative; left:0px; top:3px; margin-left:2px; font-size:23px; padding:3px; padding-right:1px; padding-top:2px; color:#bbb; color:white;" aria-hidden="true"></i>
+        </p>
+        <h3>Calendar Suggestions</h3>
         <table>
-          <tr>
-            <td>SLEEP&nbsp;&nbsp;-</td>
-            <td>Start a task each night and complete it when you wake up. Use it to see your sleeping pattern throughout the week.</td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>SLEEP  -</td>
+              <td>Start a task each night and complete it when you wake up. Use it to see your sleeping pattern throughout the week.</td>
+            </tr>
+          </tbody>
         </table>
         <table>
-          <tr>
-            <td>FOOD&nbsp;&nbsp;-</td>
-            <td>Start a task and complete it everytime you eat something. Use it as a food journal for dieting.</td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>FOOD  -</td>
+              <td>Start a task and complete it everytime you eat something. Use it as a food journal for dieting.</td>
+            </tr>
+          </tbody>
         </table>
         <table>
-          <tr>
-            <td>WORKOUT&nbsp;&nbsp;-</td>
-            <td>Start a task when you begin your workout and complete it when you finish. Use it as a fitness journal.</td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>WORKOUT  -</td>
+              <td>Start a task when you begin your workout and complete it when you finish. Use it as a fitness journal.</td>
+            </tr>
+          </tbody>
         </table>
         <table>
-          <tr>
-            <td>OTHER&nbsp;&nbsp;-</td>
-            <td>Use this task list for tasks or events that wouldn't logically fit in another category.</td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>OTHER  -</td>
+              <td>Use this task list for tasks or events that wouldn't logically fit in another category.</td>
+            </tr>
+          </tbody>
         </table>
         <table>
-          <tr>
-            <td>SCHEDULE&nbsp;&nbsp;-</td>
-            <td><b>Don't add tasks to this calendar.</b> Instead, schedule your day with it in Google Calendars, then use other calendars to complete your tasks. At the end of the day compare what you scheduled with the tasks you completed.</td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>SCHEDULE  -</td>
+              <td>
+                <b>Don't add tasks to this calendar.</b>
+ Instead, schedule your day with it in Google Calendars, then use other calendars to complete your tasks. At the end of the day compare what you scheduled with the tasks you completed.</td>
+            </tr>
+          </tbody>
         </table>
-        
-        
-      <h3>Save to homescreen</h3>
-      <p>This is a web app, which means you can save it to your phone and use it like an app. To learn how click <a href="http://lifehacker.com/5809338/add-web-site-bookmarks-to-your-iphones-homescreen">here for iPhone</a> and <a href="http://www.howtogeek.com/196087/how-to-add-websites-to-the-home-screen-on-any-smartphone-or-tablet/">here for Android</a>.</p>
-      
-      <h3>Hide instructions</h3>
-      <p style="position:relative;">
-        Tap <i onclick="hideInstructions();" style="font-size:37px; color:#4384F6; position:absolute; top:-10px; left:30px;" class="fa fa-caret-up" aria-hidden="true"></i>
-      </p>
+        <h3>Save to homescreen</h3>
+        <p>This is a web app, which means you can save it to your phone and use it like an app. To learn how click           <a href="http://lifehacker.com/5809338/add-web-site-bookmarks-to-your-iphones-homescreen">here for iPhone</a>
+ and           <a href="http://www.howtogeek.com/196087/how-to-add-websites-to-the-home-screen-on-any-smartphone-or-tablet/">here for Android</a>
+.</p>
+        <h3>Hide instructions</h3>
+        <p style="position:relative;">
+        Tap           <i onclick="hideInstructions();" style="font-size:37px; color:#4384F6; position:absolute; top:-10px; left:30px;" class="fa fa-caret-up" aria-hidden="true"></i>
+        </p>
       </div>
-      
       <div id="showInstructions" style="display:none; margin-bottom:50px;">
-      <p style="position:relative;">
-        <i onclick="showInstructions();" style="font-size:37px; color:#4384F6; position:absolute; top:-10px; left:0px;" class="fa fa-caret-down" aria-hidden="true"></i>
-      </p>
+        <p style="position:relative;">
+          <i onclick="showInstructions();" style="font-size:37px; color:#4384F6; position:absolute; top:-10px; left:0px;" class="fa fa-caret-down" aria-hidden="true"></i>
+        </p>
       </div>
       <!--<pre id="output"></pre>-->
-      
-<!--       <div class="site-footer"></div> -->
-      <div id="tasks">
-        
-      </div>
-      
-      
-    
-      
+      <!--       <div class="site-footer"></div> -->
+      <div id="tasks"></div>
       <footer class="site-footer" id="ads" style="margin-top:1000px;">
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<!-- CalendarTasks Display -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-0041371254736366"
-     data-ad-slot="9796510276"
-     data-ad-format="auto"></ins>
-<script>
+        <script async="" src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!-- CalendarTasks Display -->
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-0041371254736366" data-ad-slot="9796510276" data-ad-format="auto"></ins>
+        <script>
 (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-
+        </script>
       </footer>
     </section>
-    <section id="theCalendars">
-      
-    </section>
-      
-      
+    <section id="theCalendars"></section>
   </body>
 
 </html>
