@@ -220,6 +220,7 @@
                console.log(XMLHttpRequest);
             }
         }).done(function(task) { 
+            task = TASKAPI.setTaskPriority(task);
             console.log(task);
             title = task.title;
             if(title==""){
@@ -238,7 +239,7 @@
               }
             }; 
             template = `
-             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal" data-taskID="${task.id}"  data-taskNotes="${task.notes}" data-taskDue="${task.due}">
+             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal" data-taskID="${task.id}"  data-taskNotes="${task.notes}" data-taskDue="${task.due}" data-taskPriority="${task.priority}">
               <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:80%; display:inline-block">${title}</span>
               <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${taskListID}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px;" aria-hidden="true"></i>
               <i class="fa fa-times" onclick="TASKAPI.delete('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
@@ -288,7 +289,7 @@
   },
   "finishButton":function(taskListID,taskID,obj){
        localStorage.setItem("summary_"+tag+"_"+taskID,$("#taskwrap_"+taskListID+"_"+taskID+" span").html());
-      var id = $("#"+taskListID).attr("data-calendarID");
+       var id = $("#"+taskListID).attr("data-calendarID");
        tag = id.substring(0,8);
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['summary'] = localStorage.getItem("summary_"+tag+"_"+taskID).replace("&nbsp;","");
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['start']['dateTime'] = localStorage.getItem("start_"+tag+"_"+taskID);
@@ -342,22 +343,16 @@
       taskNotes = "";
     }
     var taskDue = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskDue");
-    if(taskDue == undefined){
-      due = 0;
-    }else{
-    today = moment();
-    taskDue = moment(taskDue);
-    var duration = moment.duration(taskDue.diff(today));
-    var daysleft = duration.asDays();
-    due = daysleft;
-    }
+    var taskPriority = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskPriority");
     var template = `
     <div style="padding:15px; font-size:20px; background:${bgColor}; color:white;">${listTitle}</div>
     <li>Notes <i class="fa fa-pencil" aria-hidden="true"></i><br/>
     <textarea  onblur="TASKAPI.updateTaskNotes('${taskListID}','${taskID}',this.value)" style="border:1px solid #ddd; border-radius:5px; padding:0px 15px; height:300px">${taskNotes}</textarea>
     </li>
     <li><i class="fa fa-clock-o" aria-hidden="true"></i> Days left until task due:<br/>
-    <span onblur="TASKAPI.updateTaskDue('${taskListID}','${taskID}',this.innerHTML)" contentEditable style=" width:50px; padding:10px; border:1px solid #ddd; border-radius:5px; ">${due}</span>
+    <span onblur="TASKAPI.updateTaskDue('${taskListID}','${taskID}',this.innerHTML)" contentEditable style=" width:50px; padding:10px; border:1px solid #ddd; border-radius:5px; ">
+    ${taskPriority}
+    </span>
     
     </li>
     `;
@@ -366,9 +361,12 @@
 
   },
   "updateTaskDue":function(taskListID,taskID,val){
-    console.log("update called");
-    due = val;
-    /*
+    $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskPriority",val);
+    today = moment();
+    newDueDate = today.add(val,"day").format()
+    //.add(val, 'day').format();
+    $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskDue",newDueDate);
+    localStorage.setItem("due"+tag+"_"+taskID,newDueDate);
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
             type: 'PUT',
@@ -377,19 +375,15 @@
                 "authorization":"Bearer "+ACCESS_TOKEN,
                 "Content-Type":"application/json"
             },
-            data: JSON.stringify({"id":taskID,"title":summary}),
+            data: JSON.stringify({"id":taskID,"due":newDueDate}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                console.log(textStatus);
                console.log(errorThrown);
                console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
-          if(typeof cb == 'function'){
-            cb();
-          }
-            //console.log("task updated: "+summary);
+            console.log(data);
         });
-    */
   },
   "updateTaskNotes":function(taskListID,taskID,val){
     console.log("update notes called");
@@ -415,14 +409,22 @@
                console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
-          if(typeof cb == 'function'){
-            cb();
-          }
             console.log(data);
         });
     
     
   },
+  "setTaskPriority":function (task){
+    today = moment();
+    //console.log("today: "+today.format());
+    task.due = moment(task.due);
+    diff = task.due.diff(today);
+    //console.log("difference : "+diff)
+    task.priority = moment.duration(diff).asDays().toFixed(2);
+    task.due = task.due.format();
+    //console.log("priority: "+task.priority);
+    return task;
+  }
  
 }    
       
@@ -599,7 +601,24 @@
                     
                     tag = hasCalendar.id.substring(0,8);
                     if(data.items && data.items.length >0){
+                        
+                        // arrange items by priority
+                        theTasks  = [];
                         data.items.forEach(function(task){
+                          theTasks.push(task);
+                        });
+                        theTasks.forEach(function(task){
+                          task = TASKAPI.setTaskPriority(task);
+                        });
+                        theTasks.sort(function compare(a,b) {
+                          if (a.priority < b.priority)
+                            return -1;
+                          if (a.priority > b.priority)
+                            return 1;
+                          return 0;
+                        }  )
+                        // loop tasks
+                        theTasks.forEach(function(task){
                           title = task.title;
                           if(title==""){
                             title="&nbsp;";
@@ -618,7 +637,7 @@
                         };  
                         var buttonState = localStorage.getItem("button_"+tag+"_"+task.id);
                         var template = `
-                          <div id="taskwrap_${tasklist.id}_${task.id}" class="task normal" data-taskID="${task.id}" data-taskNotes="${task.notes}" data-taskDue="${task.due}">
+                          <div id="taskwrap_${tasklist.id}_${task.id}" class="task normal" data-taskID="${task.id}" data-taskNotes="${task.notes}" data-taskDue="${task.due}" data-taskPriority="${task.priority}">
                           <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:80%; display:inline-block">${title}</span>
                           <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${tasklist.id}','${task.id}',this)" style="position:absolute; right:47px; top:11px; font-size:23px; " aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.delete('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
