@@ -152,7 +152,8 @@
     }else{
       notes = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
       notes.start = "";
-      $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes',JSON.stringify(notes));
+      stringNotes = JSON.stringify(notes);
+      TASKAPI.updateTaskNotes(taskListID,taskID,stringNotes)
       TASKAPI.setButtonStart(taskListID,taskID,obj);
     }
   },
