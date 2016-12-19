@@ -216,7 +216,6 @@
             headers: {
                 "authorization":"Bearer "+ACCESS_TOKEN,
                 "Content-Type":"application/json"
-
             },
             data: JSON.stringify({"title":""}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -243,8 +242,9 @@
                 'dateTime': '',
               }
             }; 
+            notes = `{"start":""}`;
             template = `
-             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal" data-taskID="${task.id}"  data-taskNotes="${task.notes}" data-taskDue="${task.due}" data-taskPriority="${task.priority}">
+             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal" data-taskID="${task.id}"  data-taskNotes='${notes}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
               <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:80%; display:inline-block">${title}</span>
               <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${taskListID}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px;" aria-hidden="true"></i>
               <i class="fa fa-times" onclick="TASKAPI.delete('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
@@ -287,10 +287,13 @@
       localStorage.setItem("summary_"+tag+"_"+taskID, $(obj).parent().find("span").html());
       localStorage.setItem("start_"+tag+"_"+taskID, moment().format());
       localStorage.setItem("button_"+tag+"_"+taskID,"finish");
-      
-      notes = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
+      console.log('here');
+      notes = $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes');
+      console.log(notes);
+      notes = JSON.parse(notes);
       notes.start = moment().format();
       stringNotes = JSON.stringify(notes);
+      console.log("call update");
       TASKAPI.updateTaskNotes(taskListID,taskID,stringNotes)
       TASKAPI.setButtonFinish(taskListID,taskID,obj)
     }else{
