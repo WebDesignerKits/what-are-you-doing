@@ -571,15 +571,20 @@
                         hasCalendar = cal;
                       }
                 });
+                
                 if(hasCalendar){
+                if(localStorage.getItem("useColors")){
+                backgroundColor = hasCalendar.backgroundColor;
+                }else{backgroundColor = "#4384F6";}
+
                 path = "https://www.googleapis.com/tasks/v1/lists/"+tasklist.id+"/tasks?access_token="+ACCESS_TOKEN;
                 (function(hasCalendar,tasklist){
                   
                   var temp = `
-                      <div id="${tasklist.id}" style="margin-bottom:15px;" data-calendarID="${hasCalendar.id}"><h3 style="color:white; background:#4384F6; background:${hasCalendar.backgroundColor}; padding:10px; padding-left:25px; padding-right:10px; padding-bottom:5px; position:relative; left:-25px; border-top-right-radius:25px; border-bottom-right-radius:25px; "><span class="taskTitle">${tasklist.title}</span> <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-dark" aria-hidden="true">
+                      <div id="${tasklist.id}" style="margin-bottom:15px;" data-calendarID="${hasCalendar.id}"><h3 style="color:white; background:${backgroundColor}; padding:10px; padding-left:25px; padding-right:10px; padding-bottom:5px; position:relative; left:-25px; border-top-right-radius:25px; border-bottom-right-radius:25px; "><span class="taskTitle">${tasklist.title}</span> <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-dark" aria-hidden="true">
   <style>
   #${tasklist.id} div.task{
-    background:${hasCalendar.backgroundColor};
+    background:${backgroundColor};
   }
   #${tasklist.id} div.task i{
     color:white;
@@ -600,8 +605,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 212 212" style="width:100%; height:100%; enable-background:new 0 0 212 212;" xml:space="preserve">
-<rect x="102.7" y="75" style="fill:${hasCalendar.backgroundColor}" width="6.7" height="62"/>
-<rect x="102.7" y="75" style="fill:${hasCalendar.backgroundColor}" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)"  width="6.7" height="62"/>
+<rect x="102.7" y="75" style="fill:${backgroundColor}" width="6.7" height="62"/>
+<rect x="102.7" y="75" style="fill:${backgroundColor}" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)"  width="6.7" height="62"/>
 </svg>
 
                       </span></h3><div class="tasks"></div></div>
@@ -909,7 +914,7 @@
               <td>OTHER  -</td>
               <td>Use this task list for tasks or events that wouldn't logically fit in another category.</td>
             </tr>
-          </tbody>
+          </tbody>r
         </table>
         <table>
           <tbody>
