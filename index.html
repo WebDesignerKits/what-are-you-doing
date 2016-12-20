@@ -61,7 +61,6 @@
     }
     .main-content table td:first-of-type{
       padding-right:10px;
-
     }
       .btn {
         background: #e0e0e0;
@@ -101,7 +100,6 @@
       .task span:focus{
         outline:none;
       }
-
       .fade{
         background:#ddd;
       }
@@ -110,10 +108,6 @@
       }
     </style>
     <script type="text/javascript">
-    function log(obj){
-      console.log(obj);
-      $("#log").append(obj);
-    }
       // Your Client ID can be retrieved from your project in the Google
       // Developer Console, https://console.developers.google.com
       var CLIENT_ID = '383204850743-8p1cu9u4g25cp82dhgqtce2qttj29976.apps.googleusercontent.com';
@@ -141,13 +135,13 @@
                 "Content-Type":"application/json"
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               log(textStatus);
-               log(errorThrown);
-               log(XMLHttpRequest);
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
             },
             data: JSON.stringify({"title":name})
         }).done(function(data) { 
-            log("list created: "+name);
+            console.log("list created: "+name);
         });
   },
   "delete":function(taskListID,taskID,obj,e){
@@ -171,12 +165,12 @@
                 "authorization":"Bearer "+ACCESS_TOKEN,
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               log(textStatus);
-               log(errorThrown);
-               log(XMLHttpRequest);
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
-            log("task deleted: ");
+            console.log("task deleted: ");
             $("#taskwrap_"+taskListID+"_"+taskID).addClass('fade');
             $("#taskwrap_"+taskListID+"_"+taskID).fadeTo(400,0,function(){
                 $("#taskwrap_"+taskListID+"_"+taskID).remove();
@@ -185,7 +179,7 @@
     
   },
   "updateTask":function(taskListID,taskID,obj,cb){
-    log("update called");
+    console.log("update called");
     summary = $(obj).html();
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
@@ -197,15 +191,15 @@
             },
             data: JSON.stringify({"id":taskID,"title":summary}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               log(textStatus);
-               log(errorThrown);
-               log(XMLHttpRequest);
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
           if(typeof cb == 'function'){
             cb();
           }
-            //log("task updated: "+summary);
+            //console.log("task updated: "+summary);
         });
       
     
@@ -223,13 +217,13 @@
             },
             data: JSON.stringify({"title":""}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               log(textStatus);
-               log(errorThrown);
-               log(XMLHttpRequest);
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
             }
         }).done(function(task) { 
             task = TASKAPI.setTaskPriority(task);
-            log(task);
+            console.log(task);
             title = task.title;
             if(title==""){
               title=" ";
@@ -270,19 +264,19 @@
   "toggleEditable":function(taskListID,taskID,obj,e){
     /*
     var value = $(obj).attr('contenteditable');
-    log(value)
+    console.log(value)
     if (value == 'false' || value == undefined) {
-            log("here")
+            console.log("here")
         $(obj).attr('contenteditable','true');
     }
     */
   },
   "blur":function(taskListID,taskID,obj,e){
-    log('blurred')
+    console.log('blurred')
   },
   "startButton":function(taskListID,taskID,obj){
-    log(taskListID+" "+taskID)
-    log(obj)
+    console.log(taskListID+" "+taskID)
+    console.log(obj)
     var id = $("#"+taskListID).attr("data-calendarID");
     tag = id.substring(0,8);
     if(SYNCED_WITH_GOOGLE){
@@ -291,13 +285,13 @@
       localStorage.setItem("summary_"+tag+"_"+taskID, $(obj).parent().find("span").html());
       localStorage.setItem("start_"+tag+"_"+taskID, moment().format());
       localStorage.setItem("button_"+tag+"_"+taskID,"finish");
-      log('here');
+      console.log('here');
       notes = $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes');
-      log(notes);
+      console.log(notes);
       notes = JSON.parse(notes);
       notes.start = moment().format();
       stringNotes = JSON.stringify(notes);
-      log("call update");
+      console.log("call update");
       TASKAPI.updateTaskNotes(taskListID,taskID,stringNotes)
       TASKAPI.setButtonFinish(taskListID,taskID,obj)
     }else{
@@ -314,7 +308,6 @@
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['start']['dateTime'] = notes.start;
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['end']['dateTime'] = moment().format();
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['description'] = localStorage.getItem("description_"+tag+"_"+taskID);
-
         var request = gapi.client.calendar.events.insert({
           'calendarId': id,
           'resource': CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]
@@ -357,7 +350,7 @@
     var listTitle = $("#"+taskListID+" h3 span.taskTitle").html();
     var bgColor = $("#"+taskListID+" h3").css("background");
     var taskNotes = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes");
-    log(taskNotes)
+    console.log(taskNotes)
     if(taskNotes == "undefined"){
       taskNotes = "";
     }
@@ -377,7 +370,6 @@
     `;
     $("#slide-out").html(template);
     $('.button-collapse').sideNav('show');
-
   },
   "updateTaskDue":function(taskListID,taskID,val){
     $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskPriority",val);
@@ -396,16 +388,16 @@
             },
             data: JSON.stringify({"id":taskID,"due":newDueDate}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               log(textStatus);
-               log(errorThrown);
-               log(XMLHttpRequest);
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
-            log(data);
+            console.log(data);
         });
   },
   "updateTaskNotes":function(taskListID,taskID,val){
-    log("update notes called");
+    console.log("update notes called");
     notes = val;
     var id = $("#"+taskListID).attr("data-calendarID");
     tag = id.substring(0,8);
@@ -423,25 +415,25 @@
             },
             data: JSON.stringify({"id":taskID,"notes":notes}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               log(textStatus);
-               log(errorThrown);
-               log(XMLHttpRequest);
+               console.log(textStatus);
+               console.log(errorThrown);
+               console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
-            log(data);
+            console.log(data);
         });
     
     
   },
   "setTaskPriority":function (task){
     today = moment();
-    //log("today: "+today.format());
+    //console.log("today: "+today.format());
     task.due = moment(task.due);
     diff = task.due.diff(today);
-    //log("difference : "+diff)
+    //console.log("difference : "+diff)
     task.priority = moment.duration(diff).asDays().toFixed(2);
     task.due = task.due.format();
-    //log("priority: "+task.priority);
+    //console.log("priority: "+task.priority);
     return task;
   }
  
@@ -461,7 +453,6 @@
                  tag = calendar.id.substring(0,8); 
  
                  CALENDAR_NAMES.push(calendar);
-
                  id = calendar.id;
                  CALENDAR_EVENTS["CALENDAR_EVENT"+tag] = {
                     'summary': localStorage.getItem("summary"+tag),
@@ -494,7 +485,6 @@
                }
              }); 
              loadTasksApi();
-
              
           });
           loadCalendarApi();
@@ -535,7 +525,6 @@
                 return 1;
               return 0;
             }  
-
       function listTaskLists() {
         $("#tasks").html(" "); 
         var request = gapi.client.tasks.tasklists.list({
@@ -546,9 +535,9 @@
           request.execute(function(resp) {
             appendPre('Task Lists:');
             var taskLists = resp.items;
-            log("taskLists")
-            log(typeof taskLists)
-            log( taskLists)
+            console.log("taskLists")
+            console.log(typeof taskLists)
+            console.log( taskLists)
             TASKLISTS = [];
             taskLists.forEach(function(tl){
               TASKLISTS.push(tl);
@@ -564,15 +553,15 @@
                       }
                   });
                   if(hasList==false){
-                  log(cal.summary+" NEEDS TASKLIST");
+                  console.log(cal.summary+" NEEDS TASKLIST");
                   TASKAPI.createList(cal.summary);
                   }else{ 
-                  log(cal.summary+" doesn't need tasklist");  
+                  console.log(cal.summary+" doesn't need tasklist");  
                   //$('#section'+cal.tag).fadeTo(500,1);
                   }
               });
               taskLists.forEach(function(tasklist){
-                log(tasklist.title)
+                console.log(tasklist.title)
                 hasCalendar = false;
                 CALENDAR_NAMES.forEach(function(cal){
                       if(tasklist.title==cal.summary){
@@ -584,7 +573,6 @@
                 if(localStorage.getItem("useColors")){
                 backgroundColor = hasCalendar.backgroundColor;
                 }else{backgroundColor = "#4384F6";}
-
                 path = "https://www.googleapis.com/tasks/v1/lists/"+tasklist.id+"/tasks?access_token="+ACCESS_TOKEN;
                 (function(hasCalendar,tasklist){
                   
@@ -616,7 +604,6 @@
 <rect x="102.7" y="75" style="fill:${backgroundColor}" width="6.7" height="62"/>
 <rect x="102.7" y="75" style="fill:${backgroundColor}" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)"  width="6.7" height="62"/>
 </svg>
-
                       </span></h3><div class="tasks"></div></div>
                     `;
                     $("#tasks").append(temp);
@@ -767,8 +754,8 @@
          CALENDAR_EVENTS["CALENDAR_EVENT"+tag]['summary'] = localStorage.getItem("summary"+tag);
          CALENDAR_EVENTS["CALENDAR_EVENT"+tag]['start']['dateTime'] = localStorage.getItem("start"+tag);
          CALENDAR_EVENTS["CALENDAR_EVENT"+tag]['end']['dateTime'] = moment().format();
-          log(CALENDAR_EVENTS["CALENDAR_EVENT"+tag]);
-          log(id);
+          console.log(CALENDAR_EVENTS["CALENDAR_EVENT"+tag]);
+          console.log(id);
           var request = gapi.client.calendar.events.insert({
             'calendarId': id,
             'resource': CALENDAR_EVENTS["CALENDAR_EVENT"+tag]
@@ -836,10 +823,8 @@
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
   ga('create', 'UA-89087680-1', 'auto');
   ga('send', 'pageview');
-
     </script>
     <ul id="slide-out" class="side-nav"></ul>
     <a href="#" data-activates="slide-out" class="button-collapse"></a>
@@ -895,7 +880,7 @@
         <table>
           <tbody>
             <tr>
-              <td>SLEEP  -</td>
+              <td>SLEEP  -</td>
               <td>Start a task each night and complete it when you wake up. Use it to see your sleeping pattern throughout the week.</td>
             </tr>
           </tbody>
@@ -903,7 +888,7 @@
         <table>
           <tbody>
             <tr>
-              <td>FOOD  -</td>
+              <td>FOOD  -</td>
               <td>Start a task and complete it everytime you eat something. Use it as a food journal for dieting.</td>
             </tr>
           </tbody>
@@ -911,7 +896,7 @@
         <table>
           <tbody>
             <tr>
-              <td>WORKOUT  -</td>
+              <td>WORKOUT  -</td>
               <td>Start a task when you begin your workout and complete it when you finish. Use it as a fitness journal.</td>
             </tr>
           </tbody>
@@ -919,7 +904,7 @@
         <table>
           <tbody>
             <tr>
-              <td>OTHER  -</td>
+              <td>OTHER  -</td>
               <td>Use this task list for tasks or events that wouldn't logically fit in another category.</td>
             </tr>
           </tbody>r
@@ -927,7 +912,7 @@
         <table>
           <tbody>
             <tr>
-              <td>SCHEDULE  -</td>
+              <td>SCHEDULE  -</td>
               <td>
                 <b>Don't add tasks to this calendar.</b>
  Instead, schedule your day with it in Google Calendars, then use other calendars to complete your tasks. At the end of the day compare what you scheduled with the tasks you completed.</td>
@@ -961,7 +946,6 @@
       </footer>
     </section>
     <section id="theCalendars"></section>
-    <pre id="log"></pre>
   </body>
 
 </html>
