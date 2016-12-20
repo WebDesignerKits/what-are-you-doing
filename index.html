@@ -110,6 +110,10 @@
       }
     </style>
     <script type="text/javascript">
+    function log(obj){
+      console.log(obj);
+      $("#log").append(obj);
+    }
       // Your Client ID can be retrieved from your project in the Google
       // Developer Console, https://console.developers.google.com
       var CLIENT_ID = '383204850743-8p1cu9u4g25cp82dhgqtce2qttj29976.apps.googleusercontent.com';
@@ -137,13 +141,13 @@
                 "Content-Type":"application/json"
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               console.log(textStatus);
-               console.log(errorThrown);
-               console.log(XMLHttpRequest);
+               log(textStatus);
+               log(errorThrown);
+               log(XMLHttpRequest);
             },
             data: JSON.stringify({"title":name})
         }).done(function(data) { 
-            console.log("list created: "+name);
+            log("list created: "+name);
         });
   },
   "delete":function(taskListID,taskID,obj,e){
@@ -167,12 +171,12 @@
                 "authorization":"Bearer "+ACCESS_TOKEN,
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               console.log(textStatus);
-               console.log(errorThrown);
-               console.log(XMLHttpRequest);
+               log(textStatus);
+               log(errorThrown);
+               log(XMLHttpRequest);
             }
         }).done(function(data) { 
-            console.log("task deleted: ");
+            log("task deleted: ");
             $("#taskwrap_"+taskListID+"_"+taskID).addClass('fade');
             $("#taskwrap_"+taskListID+"_"+taskID).fadeTo(400,0,function(){
                 $("#taskwrap_"+taskListID+"_"+taskID).remove();
@@ -181,7 +185,7 @@
     
   },
   "updateTask":function(taskListID,taskID,obj,cb){
-    console.log("update called");
+    log("update called");
     summary = $(obj).html();
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
@@ -193,15 +197,15 @@
             },
             data: JSON.stringify({"id":taskID,"title":summary}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               console.log(textStatus);
-               console.log(errorThrown);
-               console.log(XMLHttpRequest);
+               log(textStatus);
+               log(errorThrown);
+               log(XMLHttpRequest);
             }
         }).done(function(data) { 
           if(typeof cb == 'function'){
             cb();
           }
-            //console.log("task updated: "+summary);
+            //log("task updated: "+summary);
         });
       
     
@@ -219,13 +223,13 @@
             },
             data: JSON.stringify({"title":""}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               console.log(textStatus);
-               console.log(errorThrown);
-               console.log(XMLHttpRequest);
+               log(textStatus);
+               log(errorThrown);
+               log(XMLHttpRequest);
             }
         }).done(function(task) { 
             task = TASKAPI.setTaskPriority(task);
-            console.log(task);
+            log(task);
             title = task.title;
             if(title==""){
               title=" ";
@@ -266,19 +270,19 @@
   "toggleEditable":function(taskListID,taskID,obj,e){
     /*
     var value = $(obj).attr('contenteditable');
-    console.log(value)
+    log(value)
     if (value == 'false' || value == undefined) {
-            console.log("here")
+            log("here")
         $(obj).attr('contenteditable','true');
     }
     */
   },
   "blur":function(taskListID,taskID,obj,e){
-    console.log('blurred')
+    log('blurred')
   },
   "startButton":function(taskListID,taskID,obj){
-    console.log(taskListID+" "+taskID)
-    console.log(obj)
+    log(taskListID+" "+taskID)
+    log(obj)
     var id = $("#"+taskListID).attr("data-calendarID");
     tag = id.substring(0,8);
     if(SYNCED_WITH_GOOGLE){
@@ -287,13 +291,13 @@
       localStorage.setItem("summary_"+tag+"_"+taskID, $(obj).parent().find("span").html());
       localStorage.setItem("start_"+tag+"_"+taskID, moment().format());
       localStorage.setItem("button_"+tag+"_"+taskID,"finish");
-      console.log('here');
+      log('here');
       notes = $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes');
-      console.log(notes);
+      log(notes);
       notes = JSON.parse(notes);
       notes.start = moment().format();
       stringNotes = JSON.stringify(notes);
-      console.log("call update");
+      log("call update");
       TASKAPI.updateTaskNotes(taskListID,taskID,stringNotes)
       TASKAPI.setButtonFinish(taskListID,taskID,obj)
     }else{
@@ -353,7 +357,7 @@
     var listTitle = $("#"+taskListID+" h3 span.taskTitle").html();
     var bgColor = $("#"+taskListID+" h3").css("background");
     var taskNotes = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes");
-    console.log(taskNotes)
+    log(taskNotes)
     if(taskNotes == "undefined"){
       taskNotes = "";
     }
@@ -392,16 +396,16 @@
             },
             data: JSON.stringify({"id":taskID,"due":newDueDate}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               console.log(textStatus);
-               console.log(errorThrown);
-               console.log(XMLHttpRequest);
+               log(textStatus);
+               log(errorThrown);
+               log(XMLHttpRequest);
             }
         }).done(function(data) { 
-            console.log(data);
+            log(data);
         });
   },
   "updateTaskNotes":function(taskListID,taskID,val){
-    console.log("update notes called");
+    log("update notes called");
     notes = val;
     var id = $("#"+taskListID).attr("data-calendarID");
     tag = id.substring(0,8);
@@ -419,25 +423,25 @@
             },
             data: JSON.stringify({"id":taskID,"notes":notes}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               console.log(textStatus);
-               console.log(errorThrown);
-               console.log(XMLHttpRequest);
+               log(textStatus);
+               log(errorThrown);
+               log(XMLHttpRequest);
             }
         }).done(function(data) { 
-            console.log(data);
+            log(data);
         });
     
     
   },
   "setTaskPriority":function (task){
     today = moment();
-    //console.log("today: "+today.format());
+    //log("today: "+today.format());
     task.due = moment(task.due);
     diff = task.due.diff(today);
-    //console.log("difference : "+diff)
+    //log("difference : "+diff)
     task.priority = moment.duration(diff).asDays().toFixed(2);
     task.due = task.due.format();
-    //console.log("priority: "+task.priority);
+    //log("priority: "+task.priority);
     return task;
   }
  
@@ -542,9 +546,9 @@
           request.execute(function(resp) {
             appendPre('Task Lists:');
             var taskLists = resp.items;
-            console.log("taskLists")
-            console.log(typeof taskLists)
-            console.log( taskLists)
+            log("taskLists")
+            log(typeof taskLists)
+            log( taskLists)
             TASKLISTS = [];
             taskLists.forEach(function(tl){
               TASKLISTS.push(tl);
@@ -560,15 +564,15 @@
                       }
                   });
                   if(hasList==false){
-                  console.log(cal.summary+" NEEDS TASKLIST");
+                  log(cal.summary+" NEEDS TASKLIST");
                   TASKAPI.createList(cal.summary);
                   }else{ 
-                  console.log(cal.summary+" doesn't need tasklist");  
+                  log(cal.summary+" doesn't need tasklist");  
                   //$('#section'+cal.tag).fadeTo(500,1);
                   }
               });
               taskLists.forEach(function(tasklist){
-                console.log(tasklist.title)
+                log(tasklist.title)
                 hasCalendar = false;
                 CALENDAR_NAMES.forEach(function(cal){
                       if(tasklist.title==cal.summary){
@@ -763,8 +767,8 @@
          CALENDAR_EVENTS["CALENDAR_EVENT"+tag]['summary'] = localStorage.getItem("summary"+tag);
          CALENDAR_EVENTS["CALENDAR_EVENT"+tag]['start']['dateTime'] = localStorage.getItem("start"+tag);
          CALENDAR_EVENTS["CALENDAR_EVENT"+tag]['end']['dateTime'] = moment().format();
-          console.log(CALENDAR_EVENTS["CALENDAR_EVENT"+tag]);
-          console.log(id);
+          log(CALENDAR_EVENTS["CALENDAR_EVENT"+tag]);
+          log(id);
           var request = gapi.client.calendar.events.insert({
             'calendarId': id,
             'resource': CALENDAR_EVENTS["CALENDAR_EVENT"+tag]
@@ -957,6 +961,7 @@
       </footer>
     </section>
     <section id="theCalendars"></section>
+    <pre id="log"></pre>
   </body>
 
 </html>
