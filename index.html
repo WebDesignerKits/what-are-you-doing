@@ -289,9 +289,10 @@
       json = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
       json.start = moment().format();
       flatjson = JSON.stringify(json);
-      $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes',flatjson)
-      TASKAPI.updateTaskNotes(taskListID,taskID,json.notes)
-      TASKAPI.setButtonFinish(taskListID,taskID,obj)
+      $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes',flatjson);
+      TASKAPI.updateTaskNotes(taskListID,taskID,json.notes,function(){
+        TASKAPI.setButtonFinish(taskListID,taskID,obj);
+      });
     }else{
       alert('You need to authorize Google Calendars! Read below for instructions.')
     }
@@ -397,7 +398,7 @@
             console.log(data);
         });
   },
-  "updateTaskNotes":function(taskListID,taskID,val){
+  "updateTaskNotes":function(taskListID,taskID,val,cb){
     console.log("updateTaskNotes()");
     var id = $("#"+taskListID).attr("data-calendarID");
     tag = id.substring(0,8);
@@ -423,6 +424,9 @@
             }
         }).done(function(data) { 
             console.log(data);
+            if(typeof cb == "function"){
+              cb();
+            }
         });
     
     
