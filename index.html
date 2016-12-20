@@ -148,10 +148,11 @@
     if($(obj).parent().hasClass("normal")){
       TASKAPI.deleteTask(taskListID,taskID,obj,e);
     }else{
-      notes = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
-      notes.start = "";
-      stringNotes = JSON.stringify(notes);
-      TASKAPI.updateTaskNotes(taskListID,taskID,stringNotes)
+      json = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
+      json.start = "";
+      flatjson = JSON.stringify(json);
+      $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes',flatjson)
+      TASKAPI.updateTaskNotes(taskListID,taskID,json.notes);
       TASKAPI.setButtonStart(taskListID,taskID,obj);
     }
   },
@@ -285,14 +286,11 @@
       localStorage.setItem("summary_"+tag+"_"+taskID, $(obj).parent().find("span").html());
       localStorage.setItem("start_"+tag+"_"+taskID, moment().format());
       localStorage.setItem("button_"+tag+"_"+taskID,"finish");
-      console.log('here');
-      notes = $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes');
-      console.log(notes);
-      notes = JSON.parse(notes);
-      notes.start = moment().format();
-      stringNotes = JSON.stringify(notes);
-      console.log("call update");
-      TASKAPI.updateTaskNotes(taskListID,taskID,stringNotes)
+      json = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
+      json.start = moment().format();
+      flatjson = JSON.stringify(json);
+      $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes',flatjson)
+      TASKAPI.updateTaskNotes(taskListID,taskID,json.notes)
       TASKAPI.setButtonFinish(taskListID,taskID,obj)
     }else{
       alert('You need to authorize Google Calendars! Read below for instructions.')
@@ -302,12 +300,14 @@
        localStorage.setItem("summary_"+tag+"_"+taskID,$("#taskwrap_"+taskListID+"_"+taskID+" span").html());
        var id = $("#"+taskListID).attr("data-calendarID");
        tag = id.substring(0,8);
-       var notes = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
+       var json = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
        
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['summary'] = $("#taskwrap_"+taskListID+"_"+taskID+" span").html().replace("&nbsp;","");
-       CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['start']['dateTime'] = notes.start;
+       CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['start']['dateTime'] = json.start;
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['end']['dateTime'] = moment().format();
-       CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['description'] = localStorage.getItem("description_"+tag+"_"+taskID);
+       CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['description'] = json.notes;
+        console.log("sending event to google");
+        console.log(CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]);
         var request = gapi.client.calendar.events.insert({
           'calendarId': id,
           'resource': CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]
@@ -349,17 +349,18 @@
   "prioritize":function(taskListID,taskID,obj){
     var listTitle = $("#"+taskListID+" h3 span.taskTitle").html();
     var bgColor = $("#"+taskListID+" h3").css("background");
-    var taskNotes = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes");
-    console.log(taskNotes)
-    if(taskNotes == "undefined"){
-      taskNotes = "";
+    var json = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes"));
+    console.log(json)
+    
+    if(json.notes==undefined){
+      json.notes = "";
     }
     var taskDue = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskDue");
     var taskPriority = $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskPriority");
     var template = `
     <div style="padding:15px; font-size:20px; background:${bgColor}; color:white;">${listTitle}</div>
     <li>Notes <i class="fa fa-pencil" aria-hidden="true"></i><br/>
-    <textarea  onblur="TASKAPI.updateTaskNotes('${taskListID}','${taskID}',this.value)" style="border:1px solid #ddd; border-radius:5px; padding:0px 15px; height:300px">${taskNotes}</textarea>
+    <textarea  onblur="TASKAPI.updateTaskNotes('${taskListID}','${taskID}',this.value)" style="border:1px solid #ddd; border-radius:5px; padding:0px 15px; height:300px">${json.notes}</textarea>
     </li>
     <li><i class="fa fa-clock-o" aria-hidden="true"></i> Days left until task due:<br/>
     <span onblur="TASKAPI.updateTaskDue('${taskListID}','${taskID}',this.innerHTML)" contentEditable style=" width:50px; padding:10px; border:1px solid #ddd; border-radius:5px; ">
@@ -397,14 +398,15 @@
         });
   },
   "updateTaskNotes":function(taskListID,taskID,val){
-    console.log("update notes called");
-    notes = val;
+    console.log("updateTaskNotes()");
     var id = $("#"+taskListID).attr("data-calendarID");
     tag = id.substring(0,8);
-    
-    $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes",notes);
-    localStorage.setItem("description_"+tag+"_"+taskID,notes);
-    
+    console.log(val)
+    originalNotes = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes"));
+    originalNotes.notes = val;
+    flatNotes = JSON.stringify(originalNotes);
+    $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes",flatNotes);
+
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
             type: 'PUT',
@@ -413,7 +415,7 @@
                 "authorization":"Bearer "+ACCESS_TOKEN,
                 "Content-Type":"application/json"
             },
-            data: JSON.stringify({"id":taskID,"notes":notes}),
+            data: JSON.stringify({"id":taskID,"notes":flatNotes}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                console.log(textStatus);
                console.log(errorThrown);
