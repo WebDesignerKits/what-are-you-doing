@@ -437,6 +437,13 @@
     task.due = task.due.format();
     //console.log("priority: "+task.priority);
     return task;
+  },
+  "toggleColors":function(val){
+    console.log("this was called and set default colors")
+      localStorage.setItem("defaultColors",val);
+      console.log(localStorage.getItem("defaultColors") );
+      location.reload();
+    
   }
  
 }    
@@ -572,9 +579,12 @@
                 });
                 
                 if(hasCalendar){
-                if(localStorage.getItem("useColors")){
-                backgroundColor = hasCalendar.backgroundColor;
-                }else{backgroundColor = "#4384F6";}
+                  console.log("setting the backgrounds");
+                if(localStorage.getItem("defaultColors")=="true"){
+                  backgroundColor = "#4384F6";
+                }else{
+                  backgroundColor = hasCalendar.backgroundColor;
+                }
                 path = "https://www.googleapis.com/tasks/v1/lists/"+tasklist.id+"/tasks?access_token="+ACCESS_TOKEN;
                 (function(hasCalendar,tasklist){
                   
@@ -815,6 +825,14 @@
         $("#showInstructions").hide();
       }
       $(".button-collapse").sideNav();
+      defaultColors = localStorage.getItem("defaultColors");
+      console.log("default color is: "+defaultColors);
+      console.log(defaultColors=="true");
+      if(defaultColors=="true"){
+        $("#defaultColors")[0].checked = true;
+      }else{
+        $("#defaultColors")[0].checked = false;
+      }
     })
     </script>
     <script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
@@ -939,6 +957,17 @@
         <p style="position:relative;">
           Show instructions <i onclick="showInstructions();" style="font-size:37px; color:#4384F6; position:relative; top:5px; margin:auto;" class="fa fa-caret-up" aria-hidden="true"></i>
         </p>
+      </div>
+      <div style="text-align:center;">
+        <div class="switch">
+          Default colors <br/>
+        <label>
+          Off
+          <input type="checkbox" id="defaultColors" onclick="TASKAPI.toggleColors(this.checked)">
+          <span class="lever"></span>
+          On
+        </label>
+      </div>
       </div>
       <footer class="site-footer" id="ads" style="margin-top:1000px;">
         <script async="" src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
