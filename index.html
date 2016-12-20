@@ -442,7 +442,9 @@
     console.log("this was called and set default colors")
       localStorage.setItem("defaultColors",val);
       console.log(localStorage.getItem("defaultColors") );
-      location.reload();
+      setTimeout(function(){
+        location.reload();
+      },1000);
     
   }
  
