@@ -429,8 +429,6 @@
     var listTitle = $("#"+taskListID+" h3 span.taskTitle").html();
     var bgColor = $("#"+taskListID+" h3").css("background");
     var json = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes"));
-    console.log(json)
-    
     if(json.notes==undefined){
       json.notes = "";
     }
@@ -521,9 +519,7 @@
     return task;
   },
   "toggleColors":function(val){
-    console.log("this was called and set default colors")
       localStorage.setItem("defaultColors",val);
-      console.log(localStorage.getItem("defaultColors") );
       setTimeout(function(){
         location.reload();
       },1000);
@@ -540,9 +536,13 @@
           ACCESS_TOKEN = authResult.access_token;
           $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList?access_token="+authResult.access_token, function( data ) {
              data.items.forEach(function(calendar){
+               //console.log("LOADED: "+calendar.summary)
                if(calendar.accessRole=="owner"){
                  tag = calendar.id.substring(0,8); 
                  CALENDAR_NAMES.push(calendar);
+                 console.log("PUSHED: "+calendar.summary)
+               }else{
+                 //console.log(calendar.summary+" not pushed")
                }
              }); 
              loadTasksApi();
@@ -582,11 +582,9 @@
             'maxResults': 100
           });
           request.execute(function(resp) {
+            console.log(resp)
             appendPre('Task Lists:');
             var taskLists = resp.items;
-            console.log("taskLists")
-            console.log(typeof taskLists)
-            console.log( taskLists)
             TASKLISTS = [];
             taskLists.forEach(function(tl){
               TASKLISTS.push(tl);
@@ -595,8 +593,16 @@
             taskLists.sort(compare)
             if(taskLists && taskLists.length > 0) {
               CALENDAR_NAMES.forEach(function(cal){
+                console.log("again "+cal.summary)
+              });
+              taskLists.forEach(function(tl){
+                console.log("TASKLIST "+tl.title)
+              });
+              CALENDAR_NAMES.forEach(function(cal){
                   hasList = false;
                   taskLists.forEach(function(tl){
+                      console.log(tl.title+" "+cal.summary)
+                      console.log(hasList!=false);
                       if(tl.title==cal.summary){
                         hasList = cal.summary;
                         CALENDAR_ID_TASKLIST_MAP[cal.id]=tl.id;
@@ -604,7 +610,7 @@
                   });
                   if(hasList==false){
                   console.log(cal.summary+" NEEDS TASKLIST");
-                  TASKAPI.createList(cal.summary);
+                  //TASKAPI.createList(cal.summary);
                   }else{ 
                   console.log(cal.summary+" doesn't need tasklist");  
                   //$('#section'+cal.tag).fadeTo(500,1);
@@ -620,7 +626,6 @@
                 });
                 
                 if(hasCalendar){
-                  console.log("setting the backgrounds");
                 if(localStorage.getItem("defaultColors")=="true"){
                   backgroundColor = "#4384F6";
                 }else{
@@ -733,12 +738,8 @@
                   
                 })(hasCalendar,tasklist)
                 PROCESS_TASKS.push(1);
-                console.log("PROCESS_TASKS");
-                console.log(PROCESS_TASKS.length);
                 }
               });
-              console.log("taskLists");
-              console.log(taskLists.length);
               loopForEnd(taskLists);
               //listUpcomingEvents(calendar)
 
@@ -790,9 +791,6 @@
             });
             if(task_doesnt_exists){
               if(event.description!="completed"){
-              console.log("create task for event")
-              console.log(event.summary)
-              console.log(CALENDAR_ID_TASKLIST_MAP[calID]);
               calendarEvent = event;
               //  "addCalendarTask":function(calendarID,taskListID,calendarEvent,obj){
               TASKAPI.addCalendarTask(calID, CALENDAR_ID_TASKLIST_MAP[calID],calendarEvent)
