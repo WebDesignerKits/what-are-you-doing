@@ -161,7 +161,30 @@
     }
   },
   "deleteTask":function(taskListID,taskID,obj,e){
-    
+    json = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
+    if(json.hasOwnProperty("calendarTask")){
+      calendarId = $("#taskwrap_"+taskListID+"_"+taskID).attr('data-calendarID');
+      var request = gapi.client.calendar.events.get({
+          'calendarId': calendarId,
+          'eventId': json.calendarTask,
+        });
+        
+        request.execute(function(event) {
+          event.description = "completed";
+                    console.log(event)
+           var request = gapi.client.calendar.events.update({
+              'calendarId': calendarId,
+              'eventId': json.calendarTask,
+              'resource':event
+            });
+            request.execute(function(event) {
+                console.log("calendar event updated");
+            });
+
+        });
+        
+        
+    }
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
             type: 'DELETE',
@@ -271,7 +294,7 @@
                 "authorization":"Bearer "+ACCESS_TOKEN,
                 "Content-Type":"application/json"
             },
-            data: JSON.stringify({"title":calendarEvent.summary, notes:{"calendarTask":calendarEvent.id} }),
+            data: JSON.stringify({"title":calendarEvent.summary, "notes":JSON.stringify({"start":"","calendarTask":calendarEvent.id}) }),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                console.log(textStatus);
                console.log(errorThrown);
@@ -363,6 +386,7 @@
        CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]['description'] = json.notes;
         console.log("sending event to google");
         console.log(CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]);
+        
         var request = gapi.client.calendar.events.insert({
           'calendarId': id,
           'resource': CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+taskID]
@@ -689,7 +713,7 @@
                         task.json = notes;
                         
                         var template = `
-                          <div id="taskwrap_${tasklist.id}_${task.id}" class="task normal" data-taskID="${task.id}" data-taskNotes='${JSON.stringify(notes)}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
+                          <div data-calendarID="${task.calendarID}" id="taskwrap_${tasklist.id}_${task.id}" class="task normal" data-taskID="${task.id}" data-taskNotes='${JSON.stringify(notes)}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
                           <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:70%; display:inline-block">${title}</span>
                           <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${tasklist.id}','${task.id}',this)" style="position:absolute; right:47px; top:11px; font-size:23px; " aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.delete('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
@@ -752,7 +776,10 @@
     
         request.execute(function(resp) {
           var events = resp.items;
+          console.log("EVENTS");
           events.forEach(function(event){
+            console.log(event)
+
             task_doesnt_exists = true;
             TASKS.forEach(function(task){
               if(task.json.hasOwnProperty("calendarTask")){
@@ -762,12 +789,14 @@
               }
             });
             if(task_doesnt_exists){
+              if(event.description!="completed"){
               console.log("create task for event")
               console.log(event.summary)
               console.log(CALENDAR_ID_TASKLIST_MAP[calID]);
               calendarEvent = event;
               //  "addCalendarTask":function(calendarID,taskListID,calendarEvent,obj){
               TASKAPI.addCalendarTask(calID, CALENDAR_ID_TASKLIST_MAP[calID],calendarEvent)
+              }
             }
             // event.id, event.summary
           })
