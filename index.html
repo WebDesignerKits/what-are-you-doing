@@ -207,7 +207,7 @@
     
   },
   "updateTask":function(taskListID,taskID,obj,cb){
-    console.log("update called");
+    
     summary = $(obj).html();
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
@@ -225,6 +225,8 @@
                console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
+          console.log("update succes:");
+          console.log(data)
           if(typeof cb == 'function'){
             cb();
           }
@@ -252,6 +254,7 @@
                console.log(XMLHttpRequest);
             }
         }).done(function(task) { 
+            console.log("task created")
             task = TASKAPI.setTaskPriority(task);
             console.log(task);
             title = task.title;
@@ -504,6 +507,7 @@
                console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
+            console.log("update note success:")
             console.log(data);
             if(typeof cb == "function"){
               cb();
