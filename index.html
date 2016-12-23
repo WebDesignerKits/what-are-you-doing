@@ -140,6 +140,7 @@
                 "Content-Type":"application/json"
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+               alert(errorThrown)
                console.log(textStatus);
                console.log(errorThrown);
                console.log(XMLHttpRequest);
@@ -169,10 +170,8 @@
           'calendarId': calendarId,
           'eventId': json.calendarTask,
         });
-        
         request.execute(function(event) {
           event.description = "completed";
-                    console.log(event)
            var request = gapi.client.calendar.events.update({
               'calendarId': calendarId,
               'eventId': json.calendarTask,
@@ -181,10 +180,7 @@
             request.execute(function(event) {
                 console.log("calendar event updated");
             });
-
         });
-        
-        
     }
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
@@ -194,6 +190,7 @@
                 "authorization":"Bearer "+ACCESS_TOKEN,
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+               alert(errorThrown)
                console.log(textStatus);
                console.log(errorThrown);
                console.log(XMLHttpRequest);
@@ -220,6 +217,7 @@
             },
             data: JSON.stringify({"id":taskID,"title":summary}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+               alert(textStatus)
                console.log(textStatus);
                console.log(errorThrown);
                console.log(XMLHttpRequest);
@@ -246,6 +244,7 @@
             },
             data: JSON.stringify({"title":""}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+               alert(textStatus)
                console.log(textStatus);
                console.log(errorThrown);
                console.log(XMLHttpRequest);
@@ -297,6 +296,7 @@
             },
             data: JSON.stringify({"title":calendarEvent.summary, "notes":JSON.stringify({"start":"","calendarTask":calendarEvent.id}) }),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+               alert(textStatus);
                console.log(textStatus);
                console.log(errorThrown);
                console.log(XMLHttpRequest);
@@ -467,6 +467,7 @@
             },
             data: JSON.stringify({"id":taskID,"due":newDueDate}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+               alert(textStatus)
                console.log(textStatus);
                console.log(errorThrown);
                console.log(XMLHttpRequest);
@@ -495,6 +496,7 @@
             },
             data: JSON.stringify({"id":taskID,"notes":flatNotes}),
             error: function(XMLHttpRequest, textStatus, errorThrown) {
+               alert(textStatus)
                console.log(textStatus);
                console.log(errorThrown);
                console.log(XMLHttpRequest);
