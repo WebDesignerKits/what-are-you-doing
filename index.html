@@ -127,7 +127,9 @@
       var CALENDAR_EVENTS = {};
       var PROCESS_TASKS = [];
       var TASKS = [];
+      var TASKLISTS_COMPLETED=0;
       var TASKLISTS = [];
+      var TASKLISTS_WITH_CAL = [];
       var CALENDAR_ID_TASKLIST_MAP = {};
       var TASKAPI = {
   "key":"AIzaSyBwRp5_WwKljeoKEWb9IMpWSVaHFzZDIas",
@@ -538,6 +540,7 @@
           authorizeDiv.style.display = 'none';
           ACCESS_TOKEN = authResult.access_token;
           $.get( "https://www.googleapis.com/calendar/v3/users/me/calendarList?access_token="+authResult.access_token, function( data ) {
+             console.log('-LOAD CALENDARS-')
              data.items.forEach(function(calendar){
                //console.log("LOADED: "+calendar.summary)
                if(calendar.accessRole=="owner"){
@@ -548,6 +551,8 @@
                  //console.log(calendar.summary+" not pushed")
                }
              }); 
+             console.log('-CALENDARS LOADED-')
+
              loadTasksApi();
           });
           loadCalendarApi();
@@ -581,9 +586,9 @@
       } 
       var nextPageToken;
       function gatherTasks(){
+        console.log('-GATHERING TASKS-')
         var request = gapi.client.tasks.tasklists.list({"pageToken":nextPageToken});
         request.execute(function(resp) {
-          console.log(resp)
           var taskLists = resp.items;
             taskLists.forEach(function(tl){
               TASKLISTS.push(tl);
@@ -593,24 +598,23 @@
                gatherTasks();
             
           }else{
-            console.log('finished!');
-              console.log(TASKLISTS)
+            console.log('-TASKS GATHERED-');
               listTaskLists();
           }
         });
-        
       }
       function listTaskLists() {
         $("#tasks").html(" "); 
             var taskLists = TASKLISTS;
             taskLists.sort(compare)
             if(taskLists && taskLists.length > 0) {
-              
+              console.log('-DISPLAY TASKS-')
               CALENDAR_NAMES.forEach(function(cal){
                   hasList = false;
                   taskLists.forEach(function(tl){
                       if(tl.title==cal.summary){
                         hasList = cal.summary;
+                        //TASKLISTS_WITH_CAL.push(tl);
                         CALENDAR_ID_TASKLIST_MAP[cal.id]=tl.id;
                       }
                   });
@@ -622,12 +626,14 @@
                   //$('#section'+cal.tag).fadeTo(500,1);
                   }
               });
+              
               taskLists.forEach(function(tasklist){
                 console.log(tasklist.title)
                 hasCalendar = false;
                 CALENDAR_NAMES.forEach(function(cal){
                       if(tasklist.title==cal.summary){
                         hasCalendar = cal;
+                        TASKLISTS_WITH_CAL.push(tasklist);
                       }
                 });
                 
@@ -675,7 +681,6 @@
                   $.get( path, function( data ) {
                     tag = hasCalendar.id.substring(0,8);
                     if(data.items && data.items.length >0){
-                        
                         // arrange items by priority
                         theTasks  = [];
                         data.items.forEach(function(task){
@@ -694,14 +699,10 @@
                         // loop tasks
                         theTasks.forEach(function(task){
                           task.calendarID = hasCalendar.id; 
-                          
-
                           title = task.title;
                           if(title==""){
                             title=" ";
                           }
-                          
-                        
                         CALENDAR_EVENTS["CALENDAR_EVENT_"+tag+"_"+task.id] = {
                           'summary': localStorage.getItem("summary_"+tag+"_"+task.id),
                           'location': '',
@@ -720,9 +721,7 @@
                         }else{
                           notes = JSON.parse(nt);
                         }
-                        
                         task.json = notes;
-                        
                         var template = `
                           <div data-calendarID="${task.calendarID}" id="taskwrap_${tasklist.id}_${task.id}" class="task normal" data-taskID="${task.id}" data-taskNotes='${JSON.stringify(notes)}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
                           <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:70%; display:inline-block">${title}</span>
@@ -737,39 +736,34 @@
                          }else{
                            TASKAPI.setButtonStart(tasklist.id,task.id,$("#button_"+tag+"_"+task.id)[0]);
                          }
-                         TASKS.push(task);
+                         pushTASKS(task);
                     }); 
                     }
+                    TASKLISTS_COMPLETED++;
+                    tasklistCompleted();
                 });
-                  
                 })(hasCalendar,tasklist)
-                PROCESS_TASKS.push(1);
                 }
               });
-              loopForEnd(taskLists);
-              //listUpcomingEvents(calendar)
-
               $("#ads").css("margin-top","150px");
-              
             } else {
               appendPre('No task lists found.');
             }
-          
       }
-      function loopForEnd(tsl){
-        if(PROCESS_TASKS.length+1<tsl.length){
-          setTimeout(function(){
-            loopForEnd(tsl)
-          },1000);
-        }else{
-          console.log("FINISHED LOADING TASKS");
-          console.log(TASKS)
+      function tasklistCompleted(){
+        if(TASKLISTS_WITH_CAL.length == TASKLISTS_COMPLETED){
+          console.log("-TASKS DISPLAYED-");
+          TASKS.forEach(function(task){
+            //console.log(task)
+          })
           CALENDAR_NAMES.forEach(function(cal){
             listUpcomingEvents(cal.id)
-          })
+          });
         }
       }
- 
+      function pushTASKS(task){
+        TASKS.push(task);
+      }
       function listUpcomingEvents(calID) {
         var request = gapi.client.calendar.events.list({
           'calendarId': calID,
@@ -783,10 +777,7 @@
     
         request.execute(function(resp) {
           var events = resp.items;
-          console.log("EVENTS");
           events.forEach(function(event){
-            console.log(event)
-
             task_doesnt_exists = true;
             TASKS.forEach(function(task){
               if(task.json.hasOwnProperty("calendarTask")){
@@ -797,6 +788,8 @@
             });
             if(task_doesnt_exists){
               if(event.description!="completed"){
+              console.log("create this upcoming task");
+              console.log(event)
               calendarEvent = event;
               //  "addCalendarTask":function(calendarID,taskListID,calendarEvent,obj){
               TASKAPI.addCalendarTask(calID, CALENDAR_ID_TASKLIST_MAP[calID],calendarEvent)
