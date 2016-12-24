@@ -790,7 +790,7 @@
           'maxResults': 100,
           'orderBy': 'startTime'
         });
-    
+        var calID = calID;
         request.execute(function(resp) {
           var events = resp.items;
           events.forEach(function(event){
@@ -811,6 +811,8 @@
               if(calendarEvent.description!=""){
                 if(CALENDAR_ID_NAME_MAP.hasOwnProperty(calendarEvent.description)){
                 calID = CALENDAR_ID_NAME_MAP[calendarEvent.description];
+                }else{
+                  calID = calID;
                 }
               }
               //  "addCalendarTask":function(calendarID,taskListID,calendarEvent,obj){
