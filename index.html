@@ -131,6 +131,7 @@
       var TASKLISTS = [];
       var TASKLISTS_WITH_CAL = [];
       var CALENDAR_ID_TASKLIST_MAP = {};
+      var CALENDAR_ID_NAME_MAP = {};
       var TASKAPI = {
   "key":"AIzaSyBwRp5_WwKljeoKEWb9IMpWSVaHFzZDIas",
   "createList":function(name){
@@ -550,6 +551,7 @@
                if(calendar.accessRole=="owner"){
                  tag = calendar.id.substring(0,8); 
                  CALENDAR_NAMES.push(calendar);
+                 CALENDAR_ID_NAME_MAP[calendar.summary] = calendar.id;
                  console.log("PUSHED: "+calendar.summary)
                }else{
                  //console.log(calendar.summary+" not pushed")
@@ -651,7 +653,10 @@
                 (function(hasCalendar,tasklist){
                   
                   var temp = `
-                      <div id="${tasklist.id}" style="margin-bottom:15px;" data-calendarID="${hasCalendar.id}"><h3 style="color:white; background:${backgroundColor}; padding:10px; padding-left:25px; padding-right:10px; padding-bottom:5px; position:relative; left:-25px; border-top-right-radius:25px; border-bottom-right-radius:25px; "><span class="taskTitle">${tasklist.title}</span> <span style="margin-left:6px; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-dark" aria-hidden="true">
+                      <div id="${tasklist.id}" style="margin-bottom:15px;" data-calendarID="${hasCalendar.id}">
+                      <h3 style="color:white; background:${backgroundColor}; padding:10px; padding-left:25px; padding-right:10px; padding-bottom:5px; position:relative; left:-25px; border-top-right-radius:25px; border-bottom-right-radius:25px; ">
+                      <span class="taskTitle" style="height:28px; display:inline-block; margin-right:6px;" onclick="toggleTasks('${tasklist.id}',this)">${tasklist.title}</span> 
+                      <span style="display:none; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-dark" aria-hidden="true">      
                         <style>
                         #${tasklist.id} div.task{
                           background:${backgroundColor};
@@ -678,7 +683,7 @@
                       <rect x="102.7" y="75" style="fill:${backgroundColor}" width="6.7" height="62"/>
                       <rect x="102.7" y="75" style="fill:${backgroundColor}" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)"  width="6.7" height="62"/>
                       </svg>
-                      </span></h3><div class="tasks"></div></div>
+                      </span></h3><div class="tasks" style="display:none;"></div></div>
                     `;
                     $("#tasks").append(temp);
                     
@@ -763,6 +768,13 @@
           CALENDAR_NAMES.forEach(function(cal){
             listUpcomingEvents(cal.id)
           });
+          TASKLISTS.forEach(function(tasklist){
+            console.log(localStorage.getItem("toggleHeader_"+tasklist.id))
+            if(localStorage.getItem("toggleHeader_"+tasklist.id)!="hide"){
+              console.log("showing: "+tasklist.title)
+              showTasks(tasklist.id,$("#"+tasklist.id+" .taskTitle"))
+            }
+          });
         }
       }
       function pushTASKS(task){
@@ -794,7 +806,13 @@
               if(event.description!="completed"){
               console.log("create this upcoming task");
               console.log(event)
+              
               calendarEvent = event;
+              if(calendarEvent.description!=""){
+                if(CALENDAR_ID_NAME_MAP.hasOwnProperty(calendarEvent.description)){
+                calID = CALENDAR_ID_NAME_MAP[calendarEvent.description];
+                }
+              }
               //  "addCalendarTask":function(calendarID,taskListID,calendarEvent,obj){
               TASKAPI.addCalendarTask(calID, CALENDAR_ID_TASKLIST_MAP[calID],calendarEvent)
               }
@@ -895,6 +913,27 @@
       $("#showInstructions").hide();
       $('html,body').scrollTop(0);
       localStorage.setItem("instructions","show");
+    }
+    function toggleTasks(tasklistid, obj){
+      console.log("toggleTasks()")
+      console.log($(obj).hasClass("tasksHidden"))
+      if($(obj).hasClass("tasksHidden")){
+        showTasks(tasklistid,obj);
+      }else{
+        hideTasks(tasklistid,obj);
+      }
+    }
+    function hideTasks(tasklistid,obj){
+      $(obj).addClass("tasksHidden");
+        $(obj).parent().next().hide();
+        $(obj).next().hide();
+        localStorage.setItem("toggleHeader_"+tasklistid,"hide");
+    }
+    function showTasks(tasklistid,obj){
+      $(obj).removeClass("tasksHidden");
+        $(obj).parent().next().show();
+        $(obj).next().show();
+        localStorage.setItem("toggleHeader_"+tasklistid,"show");
     }
     
      $(function(){
