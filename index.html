@@ -655,7 +655,7 @@
                   var temp = `
                       <div id="${tasklist.id}" style="margin-bottom:15px;" data-calendarID="${hasCalendar.id}">
                       <h3 style="color:white; background:${backgroundColor}; padding:10px; padding-left:25px; padding-right:10px; padding-bottom:5px; position:relative; left:-25px; border-top-right-radius:25px; border-bottom-right-radius:25px; ">
-                      <span class="taskTitle" style="height:28px; display:inline-block; margin-right:6px;" onclick="toggleTasks('${tasklist.id}',this)">${tasklist.title}</span> 
+                      <span class="taskTitle tasksHidden" style="height:28px; display:inline-block; margin-right:6px;" onclick="toggleTasks('${tasklist.id}',this)">${tasklist.title}</span> 
                       <span style="display:none; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-dark" aria-hidden="true">      
                         <style>
                         #${tasklist.id} div.task{
