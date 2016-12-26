@@ -132,6 +132,7 @@
       var TASKLISTS_WITH_CAL = [];
       var CALENDAR_ID_TASKLIST_MAP = {};
       var CALENDAR_ID_NAME_MAP = {};
+      var currentlyUpdating;
       var TASKAPI = {
   "key":"AIzaSyBwRp5_WwKljeoKEWb9IMpWSVaHFzZDIas",
   "createList":function(name){
@@ -208,7 +209,7 @@
     
   },
   "updateTask":function(taskListID,taskID,obj,cb){
-    
+    currentlyUpdating = true;
     summary = $(obj).html();
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
@@ -226,6 +227,7 @@
                console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
+          currentlyUpdating = false;
           console.log("update succes:");
           console.log(data)
           if(typeof cb == 'function'){
@@ -360,28 +362,36 @@
     console.log('blurred')
   },
   "startButton":function(taskListID,taskID,obj){
-    console.log(taskListID+" "+taskID)
-    console.log(obj)
-    var id = $("#"+taskListID).attr("data-calendarID");
-    tag = id.substring(0,8);
-    if(SYNCED_WITH_GOOGLE){
-      // get the time stamp
-      // get the description
-      localStorage.setItem("summary_"+tag+"_"+taskID, $(obj).parent().find("span").html());
-      localStorage.setItem("start_"+tag+"_"+taskID, moment().format());
-      localStorage.setItem("button_"+tag+"_"+taskID,"finish");
-      json = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
-      json.start = moment().format();
-      flatjson = JSON.stringify(json);
-      $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes',flatjson);
-      TASKAPI.updateTaskNotes(taskListID,taskID,json.notes,function(){
-        TASKAPI.setButtonFinish(taskListID,taskID,obj);
-      });
+    if(currentlyUpdating == true){
+      setTimeout(function(){
+        TASKAPI.startButton(taskListID,taskID,obj);
+      },500);
     }else{
-      alert('You need to authorize Google Calendars! Read below for instructions.')
+      console.log("START BUTTON")
+      console.log(taskListID+" "+taskID)
+      console.log(obj)
+      var id = $("#"+taskListID).attr("data-calendarID");
+      tag = id.substring(0,8);
+      if(SYNCED_WITH_GOOGLE){
+        // get the time stamp
+        // get the description
+        localStorage.setItem("summary_"+tag+"_"+taskID, $(obj).parent().find("span").html());
+        localStorage.setItem("start_"+tag+"_"+taskID, moment().format());
+        localStorage.setItem("button_"+tag+"_"+taskID,"finish");
+        json = JSON.parse($("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes'));
+        json.start = moment().format();
+        flatjson = JSON.stringify(json);
+        $("#taskwrap_"+taskListID+"_"+taskID).attr('data-taskNotes',flatjson);
+        TASKAPI.updateTaskNotes(taskListID,taskID,json.notes,function(){
+          TASKAPI.setButtonFinish(taskListID,taskID,obj);
+        });
+      }else{
+        alert('You need to authorize Google Calendars! Read below for instructions.')
+      }
     }
   },
   "finishButton":function(taskListID,taskID,obj){
+       console.log("FINISH BUTTON");
        localStorage.setItem("summary_"+tag+"_"+taskID,$("#taskwrap_"+taskListID+"_"+taskID+" span").html());
        var id = $("#"+taskListID).attr("data-calendarID");
        tag = id.substring(0,8);
@@ -863,6 +873,7 @@
       }
      
       function finishButton(obj,id){
+        console.log("FINISH BUTTON")
          var id = id || 'primary';
          tag = id.substring(0,8);
          CALENDAR_EVENTS["CALENDAR_EVENT"+tag]['summary'] = localStorage.getItem("summary"+tag);
