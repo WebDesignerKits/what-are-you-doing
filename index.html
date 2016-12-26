@@ -467,6 +467,7 @@
     $('.button-collapse').sideNav('show');
   },
   "updateTaskDue":function(taskListID,taskID,val){
+    currentlyUpdating = true;
     $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskPriority",val);
     today = moment();
     newDueDate = today.add(val,"day").format()
@@ -489,10 +490,12 @@
                console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
+            currentlyUpdating = false;
             console.log(data);
         });
   },
   "updateTaskNotes":function(taskListID,taskID,val,cb){
+    currentlyUpdating = true;
     console.log("updateTaskNotes()");
     var id = $("#"+taskListID).attr("data-calendarID");
     tag = id.substring(0,8);
@@ -518,6 +521,7 @@
                console.log(XMLHttpRequest);
             }
         }).done(function(data) { 
+           currentlyUpdating = false;
             console.log("update note success:")
             console.log(data);
             if(typeof cb == "function"){
