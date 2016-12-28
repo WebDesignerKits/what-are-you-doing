@@ -933,6 +933,8 @@
       $('html,body').scrollTop(0);
       localStorage.setItem("instructions","show");
     }
+    
+    
     function toggleTasks(tasklistid, obj){
       console.log("toggleTasks()")
       console.log($(obj).hasClass("tasksHidden"))
@@ -941,6 +943,17 @@
       }else{
         hideTasks(tasklistid,obj);
       }
+    }
+    
+    function showAllTasks(){
+      TASKLISTS.forEach(function(task){
+        showTasks(task.id,$('#'+task.id+" .taskTitle"));
+      });
+    }
+    function hideAllTasks(){
+      TASKLISTS.forEach(function(task){
+        hideTasks(task.id,$('#'+task.id+" .taskTitle"));
+      });
     }
     function hideTasks(tasklistid,obj){
       $(obj).addClass("tasksHidden");
@@ -1093,6 +1106,24 @@
       
       <!--<pre id="output"></pre>-->
       <!--       <div class="site-footer"></div> -->
+      
+      
+                      <div  style="margin-bottom:15px;" >
+                      <h3 style="color:white; background:#4384F6; padding:10px; padding-left:25px; padding-right:10px; padding-bottom:5px; position:relative; left:-25px; border-top-right-radius:25px; border-bottom-right-radius:25px; ">
+                      <span onclick="hideAllTasks()" style="position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" class="btn-floating waves-effect waves-dark" aria-hidden="true">      
+                      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                      	 viewBox="0 0 212 212" style="width:100%; height:100%; enable-background:new 0 0 212 212;" xml:space="preserve">
+                      <rect x="102.7" y="75" style="fill:#4384F6" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)"  width="6.7" height="62"/>
+                      </svg>
+                      </span>
+                      <span onclick="showAllTasks()" style="position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;"  class="btn-floating waves-effect waves-dark" aria-hidden="true">      
+                      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                      	 viewBox="0 0 212 212" style="width:100%; height:100%; enable-background:new 0 0 212 212;" xml:space="preserve">
+                      <rect x="102.7" y="75" style="fill:#4384F6" width="6.7" height="62"/>
+                      <rect x="102.7" y="75" style="fill:#4384F6" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)"  width="6.7" height="62"/>
+                      </svg>
+                      </span></h3></div>
+      
       <div id="tasks" style="min-height:400px;"></div>
       <div id="showInstructions" style="display:none; margin-bottom:20px; text-align:center;">
         <p style="position:relative;">
