@@ -780,7 +780,9 @@
             //console.log(task)
           })
           CALENDAR_NAMES.forEach(function(cal){
-            listUpcomingEvents(cal.id)
+            if(cal.summary!="PLAN"){
+              listUpcomingEvents(cal.id)
+            }
           });
           TASKLISTS.forEach(function(tasklist){
             console.log(localStorage.getItem("toggleHeader_"+tasklist.id))
