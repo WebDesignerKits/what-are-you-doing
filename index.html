@@ -800,7 +800,7 @@
         var request = gapi.client.calendar.events.list({
           'calendarId': calID,
           'timeMin': (new Date()).toISOString(),
-          'timeMax': moment().endOf('day').format(),
+          'timeMax': moment().add(1,'day').endOf('day').format(),
           'showDeleted': false,
           'singleEvents': true,
           'maxResults': 100,
