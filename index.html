@@ -29,6 +29,9 @@
     #description:focus{
       outline:none;
     }
+    .hidden{
+      display:none;
+    }
     h3, .main-content h3{
       font-size:20px; padding-top:20px; display:inline-block;
       color:#4384F6;
@@ -280,7 +283,7 @@
             }; 
             notes = `{"start":""}`;
             template = `
-             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal" data-taskID="${task.id}"  data-taskNotes='${notes}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
+             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal hidden" data-taskID="${task.id}"  data-taskNotes='${notes}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
               <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:70%; display:inline-block">${title}</span>
               <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${taskListID}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px;" aria-hidden="true"></i>
               <i class="fa fa-times" onclick="TASKAPI.delete('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
@@ -333,7 +336,7 @@
             }; 
             notes = `{"start":"","calendarTask":"${calendarEvent.id}"}`;
             template = `
-             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal" data-taskID="${task.id}"  data-taskNotes='${notes}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
+             <div id="taskwrap_${taskListID}_${task.id}" style="display:none" class="task normal hidden" data-taskID="${task.id}"  data-taskNotes='${notes}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
               <span onblur="TASKAPI.updateTask('${taskListID}','${task.id}',this)" contenteditable style="width:80%; display:inline-block">${title}</span>
               <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${taskListID}','${task.id}',this)" style="position:absolute; right:50px; top:11px; font-size:23px;" aria-hidden="true"></i>
               <i class="fa fa-times" onclick="TASKAPI.delete('${taskListID}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
@@ -701,7 +704,7 @@
                       </svg>
                       </span>
                       <span class="taskNumber" style="display:none"></span>
-                      </h3><div class="tasks" style="display:none;"></div></div>
+                      </h3><div class="tasks" style=""></div></div>
                     `;
                     $("#tasks").append(temp);
                     
@@ -750,7 +753,7 @@
                         }
                         task.json = notes;
                         var template = `
-                          <div data-calendarID="${task.calendarID}" id="taskwrap_${tasklist.id}_${task.id}" class="task normal" data-taskID="${task.id}" data-taskNotes='${JSON.stringify(notes)}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
+                          <div data-calendarID="${task.calendarID}" id="taskwrap_${tasklist.id}_${task.id}" class="task normal hidden" data-taskID="${task.id}" data-taskNotes='${JSON.stringify(notes)}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
                           <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:70%; display:inline-block">${title}</span>
                           <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${tasklist.id}','${task.id}',this)" style="position:absolute; right:49px; top:11px; font-size:23px; " aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.delete('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
@@ -964,15 +967,25 @@
     function hideTasks(tasklistid,obj){
       $(obj).addClass("tasksHidden");
       length = $(obj).parent().next().find('.task').length;
-        $(obj).parent().next().hide();
+        $(obj).parent().next().find('.task').each(function(){
+          if($(this).hasClass('normal')){
+            $(this).hide();
+          }else{
+            $(this).removeClass("hidden");
+            $(this).show();
+          }
+        })
         $(obj).parent().find('.plus').hide();
-        $(obj).parent().find('.taskNumber').html(length);
-        $(obj).parent().find('.taskNumber').show();
+        //$(obj).parent().find('.taskNumber').html(length);
+        //$(obj).parent().find('.taskNumber').show();
         localStorage.setItem("toggleHeader_"+tasklistid,"hide");
     }
     function showTasks(tasklistid,obj){
       $(obj).removeClass("tasksHidden");
-        $(obj).parent().next().show();
+        $(obj).parent().next().find('.task').each(function(){
+          $(this).removeClass("hidden");
+          $(this).show();
+        })
         $(obj).parent().find('.plus').show();
         $(obj).parent().find('.taskNumber').hide();
         localStorage.setItem("toggleHeader_"+tasklistid,"show");
