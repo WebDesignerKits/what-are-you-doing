@@ -454,7 +454,7 @@
     var template = `
     <div style="padding:15px; font-size:20px; background:${bgColor}; color:white;">${listTitle}</div>
     <li>Notes <i class="fa fa-pencil" aria-hidden="true"></i><br/>
-    <textarea  onblur="TASKAPI.updateTaskNotes('${taskListID}','${taskID}',this.value)" style="border:1px solid #ddd; border-radius:5px; padding:15px 15px; line-height:16px; font-size:16px; height:300px">${json.notes}</textarea>
+    <textarea  onblur="TASKAPI.updateTaskNotes('${taskListID}','${taskID}',this.value)" style="border:1px solid #ddd; border-radius:5px; padding:15px 15px; line-height:20px; font-size:16px; height:300px">${json.notes}</textarea>
     </li>
     <li><i class="fa fa-clock-o" aria-hidden="true"></i> Days left until task due:<br/>
     <span onblur="TASKAPI.updateTaskDue('${taskListID}','${taskID}',this.innerHTML)" contentEditable style=" width:50px; padding:10px; border:1px solid #ddd; border-radius:5px; ">
