@@ -80,7 +80,9 @@
         text-decoration: none;
         margin-bottom:20px;
       }
-      
+      .taskNumber{
+        padding-right:7px;
+      }
       .finish {
         background: #50616b;
         background-image: -webkit-linear-gradient(top, #50616b, #7f909c);
@@ -670,7 +672,7 @@
                       <div id="${tasklist.id}" style="margin-bottom:15px;" data-calendarID="${hasCalendar.id}">
                       <h3 style="color:white; background:${backgroundColor}; padding:10px; padding-left:25px; padding-right:10px; padding-bottom:5px; position:relative; left:-25px; border-top-right-radius:25px; border-bottom-right-radius:25px; ">
                       <span class="taskTitle tasksHidden" style="height:28px; display:inline-block; margin-right:6px;" onclick="toggleTasks('${tasklist.id}',this)">${tasklist.title}</span> 
-                      <span style="display:none; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="btn-floating waves-effect waves-dark" aria-hidden="true">      
+                      <span style="display:none; position:relative; top:-3px; text-align:center; width:28px; height:28px; background:#159957; background:#4384F6; background:white;" onclick="TASKAPI.addTask('${hasCalendar.id}','${tasklist.id}',this,event)" class="plus btn-floating waves-effect waves-dark" aria-hidden="true">      
                         <style>
                         #${tasklist.id} div.task{
                           background:${backgroundColor};
@@ -697,7 +699,9 @@
                       <rect x="102.7" y="75" style="fill:${backgroundColor}" width="6.7" height="62"/>
                       <rect x="102.7" y="75" style="fill:${backgroundColor}" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 212 1.421085e-14)"  width="6.7" height="62"/>
                       </svg>
-                      </span></h3><div class="tasks" style="display:none;"></div></div>
+                      </span>
+                      <span class="taskNumber" style="display:none"></span>
+                      </h3><div class="tasks" style="display:none;"></div></div>
                     `;
                     $("#tasks").append(temp);
                     
@@ -789,6 +793,8 @@
             if(localStorage.getItem("toggleHeader_"+tasklist.id)!="hide"){
               console.log("showing: "+tasklist.title)
               showTasks(tasklist.id,$("#"+tasklist.id+" .taskTitle"))
+            }else{
+              hideTasks(tasklist.id,$("#"+tasklist.id+" .taskTitle"))
             }
           });
         }
@@ -957,14 +963,18 @@
     }
     function hideTasks(tasklistid,obj){
       $(obj).addClass("tasksHidden");
+      length = $(obj).parent().next().find('.task').length;
         $(obj).parent().next().hide();
-        $(obj).next().hide();
+        $(obj).parent().find('.plus').hide();
+        $(obj).parent().find('.taskNumber').html(length);
+        $(obj).parent().find('.taskNumber').show();
         localStorage.setItem("toggleHeader_"+tasklistid,"hide");
     }
     function showTasks(tasklistid,obj){
       $(obj).removeClass("tasksHidden");
         $(obj).parent().next().show();
-        $(obj).next().show();
+        $(obj).parent().find('.plus').show();
+        $(obj).parent().find('.taskNumber').hide();
         localStorage.setItem("toggleHeader_"+tasklistid,"show");
     }
     
