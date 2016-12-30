@@ -111,22 +111,6 @@
       .main-content{
         padding:15px;
       }
-      #frame{ flex:1; order:2; height:1200px;  }
-      #calendartasks{ flex:1; order:1;  }
-      #flexwrap{
-        display:flex;
-        flex-direction: column;
-        align-items: stretch;
-      }
-    @media screen and (min-width: 480px) {
-      #frame{ flex:1; order:2; }
-      #calendartasks{ flex:1; order:1; }
-      #flexwrap{
-        display:flex;
-        flex-direction: row;
-        align-items: stretch;
-      }
-    }  
     </style>
     <script type="text/javascript">
       // Your Client ID can be retrieved from your project in the Google
@@ -525,7 +509,6 @@
     originalNotes.notes = val;
     flatNotes = JSON.stringify(originalNotes);
     $("#taskwrap_"+taskListID+"_"+taskID).attr("data-taskNotes",flatNotes);
-
     path = "https://www.googleapis.com/tasks/v1/lists/"+taskListID+"/tasks/"+taskID+"?key="+TASKAPI.key;
     $.ajax({ 
             type: 'PUT',
@@ -572,7 +555,6 @@
   }
  
 }    
-
       function handleAuthResult(authResult) {
         var authorizeDiv = document.getElementById('authorize-div');
         if (authResult && !authResult.error) {
@@ -593,7 +575,6 @@
                }
              }); 
              console.log('-CALENDARS LOADED-')
-
              loadTasksApi();
           });
           loadCalendarApi();
@@ -768,16 +749,12 @@
                           notes = JSON.parse(nt);
                         }
                         task.json = notes;
-                        clockColor = "";
-                        if(task.priority>0){
-                          clockColor ="background:red"
-                        }
                         var template = `
                           <div data-calendarID="${task.calendarID}" id="taskwrap_${tasklist.id}_${task.id}" class="task normal hidden" data-taskID="${task.id}" data-taskNotes='${JSON.stringify(notes)}' data-taskDue="${task.due}" data-taskPriority="${task.priority}">
                           <span onblur="TASKAPI.updateTask('${tasklist.id}','${task.id}',this)" contenteditable style="width:70%; display:inline-block">${title}</span>
                           <i id="button_${tag}_${task.id}" class="fa fa-calendar-o" onclick="TASKAPI.startButton('${tasklist.id}','${task.id}',this)" style="position:absolute; right:49px; top:11px; font-size:23px; " aria-hidden="true"></i>
                           <i class="fa fa-times" onclick="TASKAPI.delete('${tasklist.id}','${task.id}',this,event)" aria-hidden="true" style="position:absolute; right:10px; top:9px; font-size:27px;"></i>
-                          <i class="fa fa-clock-o" onclick="TASKAPI.prioritize('${tasklist.id}','${task.id}',this)" style="position:absolute; right:90px; top:9px; font-size:27px; ${clockColor}" aria-hidden="true"></i>
+                          <i class="fa fa-clock-o" onclick="TASKAPI.prioritize('${tasklist.id}','${task.id}',this)" style="position:absolute; right:90px; top:9px; font-size:27px;" aria-hidden="true"></i>
                           </div>
                         `;
                         $("#"+tasklist.id+" div.tasks").append(template);
@@ -806,17 +783,6 @@
           TASKS.forEach(function(task){
             //console.log(task)
           })
-          // 
-          var calendarstring = "";
-          console.log('--CALENDAR STRING--');
-          CALENDAR_NAMES.forEach(function(cal){
-            calendarstring+=`src=${cal.id}&amp;color=%23${cal.backgroundColor}&amp;`;
-            });
-          calendarstring = `src=o1n2g4oom6l4m3uv86das2khu4@group.calendar.google.com&amp;color=%23#f83a22&amp;src=56sbnv79sramr5lj8v2ho61h68@group.calendar.google.com&amp;color=%23#9fe1e7&amp;src=4sfmb0iv027i4qvs23ct73sspg@group.calendar.google.com&amp;color=%23#f83a22&amp;src=iqjns384qct3vcikp1k1tgkmn8@group.calendar.google.com&amp;color=%23#fbe983&amp;src=ir45fge0cd35opcusr9lbagvso@group.calendar.google.com&amp;color=%23#ffad46&amp;src=446qgo956gn7pvk86d6hasjcmk@group.calendar.google.com&amp;color=%23#4986e7&amp;src=cht86s0ntbk53gni2i38ipmnqs@group.calendar.google.com&amp;color=%23#f691b2&amp;src=575s5ko8mb0ukvbfs4ie4ds34s@group.calendar.google.com&amp;color=%23#cabdbf&amp;src=8fqrckag67hserugscs8c9gvoc@group.calendar.google.com&amp;color=%23#f691b2&amp;src=q2i07mmf6k07trjgte93j81mv0@group.calendar.google.com&amp;color=%23#cca6ac&amp;src=dnr2rhbic8eku2ivba9hnihq5k@group.calendar.google.com&amp;color=%23#9fe1e7&amp;src=9ovpcosi4lg2rplgt9gbjcsb70@group.calendar.google.com&amp;color=%23#b3dc6c&amp;src=et9pr9bf3dfuq0ah1vvpfpg534@group.calendar.google.com&amp;color=%23#9fe1e7&amp;src=es0tnuf4ptfef3lhunq4j0ljak@group.calendar.google.com&amp;color=%23#cd74e6&amp;src=h6evmmfsaqgulanmt49i1tvboc@group.calendar.google.com&amp;color=%23#9fe1e7&amp;src=3nh1mgslf1p0gdm2o58mgd158k@group.calendar.google.com&amp;color=%23#fad165&amp;src=pj1rhf1qm6dh2o11t98pr5js6g@group.calendar.google.com&amp;color=%23#9a9cff&amp;src=g6d3hsaqnkbp979veovi211q1o@group.calendar.google.com&amp;color=%23#42d692&amp;src=24vr1t3kqj23qq5sclis3lmth8@group.calendar.google.com&amp;color=%23#f691b2&amp;src=udtq1lqbb4g2hbcn6cg3u6ni3o@group.calendar.google.com&amp;color=%23#92e1c0&amp;src=7v4qqr4f40qtpuf95h79nd0ad8@group.calendar.google.com&amp;color=%23#ac725e&amp;src=3fgfve2r9as0e57uuj6rfqqbu8@group.calendar.google.com&amp;color=%23#b3dc6c&amp;src=eqdfur0urdkb0qa32us7929kck@group.calendar.google.com&amp;color=%23#7bd148&amp;src=35k4csc6k5ckjifo72i0rhtdb8@group.calendar.google.com&amp;color=%23#a47ae2&amp;src=cabobean@gmail.com&amp;color=%23#cabdbf&amp;`;
-          calendarstring = `src=o1n2g4oom6l4m3uv86das2khu4@group.calendar.google.com&amp;color=%23#f83a22&amp;src=56sbnv79sramr5lj8v2ho61h68@group.calendar.google.com&amp;color=%23#9fe1e7&amp;src=4sfmb0iv027i4qvs23ct73sspg@group.calendar.google.com&amp;color=%23#f83a22&amp;src=iqjns384qct3vcikp1k1tgkmn8@group.calendar.google.com&amp;color=%23#fbe983&amp;src=ir45fge0cd35opcusr9lbagvso@group.calendar.google.com&amp;color=%23#ffad46&amp;src=446qgo956gn7pvk86d6hasjcmk@group.calendar.google.com&amp;color=%23#4986e7&amp;src=cht86s0ntbk53gni2i38ipmnqs@group.calendar.google.com&amp;color=%23#f691b2&amp;src=575s5ko8mb0ukvbfs4ie4ds34s@group.calendar.google.com&amp;color=%23#cabdbf&amp;src=8fqrckag67hserugscs8c9gvoc@group.calendar.google.com&amp;color=%23#f691b2&amp;src=q2i07mmf6k07trjgte93j81mv0@group.calendar.google.com&amp;color=%23#cca6ac&amp;src=dnr2rhbic8eku2ivba9hnihq5k@group.calendar.google.com&amp;`;
-          iframetemp = `<iframe src="https://calendar.google.com/calendar/embed?mode=DAY&amp;showTitle=0&amp;bgcolor=%23FFFFFF&amp;showPrint=0&amp;wkst=1&amp;${calendarstring}&amp;ctz=America%2FDenver" style="border-width:0" width="100%" frameborder="0" scrolling="no"></iframe>`;
-          console.log(iframetemp);
-          $("#frame").html(iframetemp)
           CALENDAR_NAMES.forEach(function(cal){
             if(cal.summary!="PLAN"){
               listUpcomingEvents(cal.id)
@@ -1055,20 +1021,12 @@
   ga('create', 'UA-89087680-1', 'auto');
   ga('send', 'pageview');
     </script>
-
     <ul id="slide-out" class="side-nav"></ul>
     <a href="#" data-activates="slide-out" class="button-collapse"></a>
     <!--<section class="page-header">-->
     <!--  <h1 class="project-name">What are you doing?</h1>-->
     <!--  <h2 class="project-tagline"></h2>-->
     <!--</section>-->
-
-<section id="flexwrap">  
-  <div id="frame" style="padding-right:10px; display:flex; align-items: stretch">
-   <!--<iframe src="https://calendar.google.com/calendar/embed?mode=DAY&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=cabobean%40gmail.com&amp;color=%238D6F47&amp;src=et9pr9bf3dfuq0ah1vvpfpg534%40group.calendar.google.com&amp;color=%231B887A&amp;src=dnr2rhbic8eku2ivba9hnihq5k%40group.calendar.google.com&amp;color=%231B887A&amp;src=3fgfve2r9as0e57uuj6rfqqbu8%40group.calendar.google.com&amp;color=%235F6B02&amp;ctz=America%2FDenver" style="border-width:0; flex:1;" width="100%"  frameborder="0" scrolling="no"></iframe>-->
-  </div>
-  <div id="calendartasks">    
-    
     <section class="main-content">
       <div style="width:100%; position:relative; text-align:center;">
         <img style="width:300px; position:relative; margin:auto;" src="http://calendartasks.com/logo_short.png" />
@@ -1203,12 +1161,7 @@
         </label>
       </div>
       </div>
-      
-    </section>
-    <section id="theCalendars"></section>
-    </div>
-   </section><!-- end container --> 
-   <footer class="site-footer" id="ads" style="margin-top:1000px;">
+      <footer class="site-footer" id="ads" style="margin-top:1000px;">
         <script async="" src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
         <!-- CalendarTasks Display -->
         <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-0041371254736366" data-ad-slot="9796510276" data-ad-format="auto"></ins>
@@ -1216,6 +1169,9 @@
 (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
       </footer>
+    </section>
+    <section id="theCalendars"></section>
+    
   </body>
 
 </html>
